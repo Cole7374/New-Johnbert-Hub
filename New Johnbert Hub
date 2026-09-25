@@ -1,248 +1,306 @@
-local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
-local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+-- ================= JOHNBERT HUB - FLUENT UI + BOUNDED DRAGGABLE TOGGLE ICON =================
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local ProtectedGui = (gethui and gethui()) or CoreGui
 
--- ================= WEBHOOK FUNCTION =================
-local WebhookURL = "https://discord.com/api/webhooks/1552664878903205939/nIhoJl-yZrKzYol8kBwMzhKCt-fYlcfLr6AehmafF8_HRVPKvrUCZ-6B3SykbUD05TAv"
-
-local function SendWebhook(title, messageText, imageUrl)
-    local Players = game:GetService("Players")
-    local LocalPlayer = Players.LocalPlayer
-    local HttpService = game:GetService("HttpService")
-    
-    local thumbSuccess, thumbUrl = pcall(function()
-        local content = game:HttpGet("https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. LocalPlayer.UserId .. "&size=420x420&format=Png&isCircular=false")
-        local data = HttpService:JSONDecode(content)
-        return data.data[1].imageUrl
-    end)
-    
-    local avatarImage = thumbSuccess and thumbUrl or ""
-
-    local embed = {
-        ["title"] = title,
-        ["color"] = 16777215, -- White color
-        ["fields"] = {
-            {["name"] = "👤 Username:", ["value"] = LocalPlayer.Name, ["inline"] = true},
-            {["name"] = "🆔 User ID:", ["value"] = tostring(LocalPlayer.UserId), ["inline"] = true},
-            {["name"] = "🎮 Game ID:", ["value"] = tostring(game.PlaceId), ["inline"] = true},
-            {["name"] = "💬 Message:", ["value"] = messageText, ["inline"] = false},
-        },
-        ["thumbnail"] = {
-            ["url"] = avatarImage
-        },
-        ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
-    }
-
-    if imageUrl and imageUrl ~= "" then
-        embed["image"] = {
-            ["url"] = imageUrl
-        }
-    end
-
-    local data = {
-        ["content"] = "",
-        ["embeds"] = {embed}
-    }
-    
-    local json = HttpService:JSONEncode(data)
-    local requestFunc = syn and syn.request or http_request or request or (http and http.request)
-    if requestFunc then
-        pcall(function()
-            requestFunc({
-                Url = WebhookURL,
-                Method = "POST",
-                Headers = {["Content-Type"] = "application/json"},
-                Body = json
-            })
-        end)
-    end
+if ProtectedGui:FindFirstChild("JohnbertFluentHub") then 
+    ProtectedGui.JohnbertFluentHub:Destroy() 
 end
 
--- Send load log
+if ProtectedGui:FindFirstChild("JohnbertToggleIcon") then 
+    ProtectedGui.JohnbertToggleIcon:Destroy() 
+end
+
+-- Play startup sound
 pcall(function()
-    SendWebhook("🚀 JohnBert Hub Executed", "Nag-load ang script sa laro.", nil)
+    local MainSound = Instance.new("Sound")
+    MainSound.Name = "JohnBertMainUISound"
+    MainSound.SoundId = "rbxassetid://135062039022934"
+    MainSound.Volume = 0.7
+    MainSound.Parent = ProtectedGui
+    MainSound:Play()
 end)
 
--- ================= UI SETUP =================
-local Window = Library:CreateWindow({
-    Title = 'JohnBert Hub - White Edition',
-    Center = true,
-    AutoShow = true,
-    TabPadding = 8,
-    MenuFadeTime = 0.2
+-- Create Bounded Draggable Toggle Icon (Square rounded, no sharp edges)
+local ToggleGui = Instance.new("ScreenGui")
+ToggleGui.Name = "JohnbertToggleIcon"
+ToggleGui.Parent = ProtectedGui
+ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+local ToggleButton = Instance.new("ImageButton")
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Parent = ToggleGui
+ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ToggleButton.Position = UDim2.new(0.05, 0, 0.1, 0)
+ToggleButton.Size = UDim2.new(0, 50, 0, 50)
+ToggleButton.Image = "rbxassetid://95829563639545"
+ToggleButton.AutoButtonColor = true
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 12) -- Rounded square shape, walay hait
+UICorner.Parent = ToggleButton
+
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Color = Color3.fromRGB(100, 100, 255)
+UIStroke.Thickness = 2
+UIStroke.Parent = ToggleButton
+
+-- Draggable Logic with Screen Boundary Restriction (Bawal maka-gawas sa screen)
+local dragging = false
+local dragInput, dragStart, startPos
+
+ToggleButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = ToggleButton.AbsolutePosition
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        local newX = startPos.X + delta.X
+        local newY = startPos.Y + delta.Y
+        
+        -- Kuhaon ang size sa screen aron dili gyud ma-awas
+        local viewportSize = ToggleGui.AbsoluteSize
+        local maxX = viewportSize.X - ToggleButton.AbsoluteSize.X
+        local maxY = viewportSize.Y - ToggleButton.AbsoluteSize.Y
+        
+        -- I-clamp ang posisyon aron naa ra gyud sa sulod sa screen
+        newX = math.clamp(newX, 0, maxX)
+        newY = math.clamp(newY, 0, maxY)
+        
+        ToggleButton.Position = UDim2.new(0, newX, 0, newY)
+    end
+end)
+
+local Success, Fluent = pcall(function()
+    return loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+end)
+
+if not Success or not Fluent then
+    warn("Failed to load Fluent UI.")
+    return
+end
+
+local Window = Fluent:CreateWindow({
+    Title = "Johnbert Hub | Steal An Egg",
+    SubTitle = "by Johnbert",
+    TabWidth = 110,
+    Size = UDim2.fromOffset(450, 280), -- Tama-tama ra ang size sa cellphone
+    Acrylic = false,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl
 })
+
+-- Toggle UI Visibility when clicking the floating icon
+ToggleButton.MouseButton1Click:Connect(function()
+    Window:Minimize()
+end)
 
 local Tabs = {
-    ["Creator Log"] = Window:AddTab("Creator Log"),
-    ["Send Image"] = Window:AddTab("Send Image"),
-    ["Sena Hub"] = Window:AddTab("Sena Hub"),
-    ["Steal An Egg 1"] = Window:AddTab("Steal An Egg 1"),
-    ["Simple Shader"] = Window:AddTab("Simple Shader"),
-    ["LKZ Hub"] = Window:AddTab("LKZ Hub"),
-    ["Steal An Egg 2"] = Window:AddTab("Steal An Egg 2"),
-    ["Pastefy Script"] = Window:AddTab("Pastefy Script"),
-    ["ON Hub"] = Window:AddTab("ON Hub"),
-    ["Miranda Steal Eggs"] = Window:AddTab("Miranda Steal Eggs"),
-    ["Lennon Hub V2"] = Window:AddTab("Lennon Hub V2"),
-    ["Solix Hub"] = Window:AddTab("Solix Hub"),
-    ["BF Loader"] = Window:AddTab("BF Loader"),
-    ["Lennon Hub V3"] = Window:AddTab("Lennon Hub V3"),
+    Creator = Window:AddTab({ Title = "Creator", Icon = "user" }),
+    Lennon = Window:AddTab({ Title = "Lennon", Icon = "terminal" }),
+    Void = Window:AddTab({ Title = "VoidShell", Icon = "box" }),
+    Ww = Window:AddTab({ Title = "Ww", Icon = "code" }),
+    Shaders = Window:AddTab({ Title = "Shaders", Icon = "eye" }),
+    Pastefy = Window:AddTab({ Title = "Pastefy", Icon = "file-text" }),
+    Chilli = Window:AddTab({ Title = "Chilli", Icon = "zap" }),
+    Sab = Window:AddTab({ Title = "SabScript", Icon = "cpu" }),
+    Miranda = Window:AddTab({ Title = "Miranda", Icon = "layers" }),
+    LKZ = Window:AddTab({ Title = "LKZ", Icon = "globe" }),
+    Solix = Window:AddTab({ Title = "Solix", Icon = "shield" }),
+    Decode = Window:AddTab({ Title = "De:Code", Icon = "command" }),
+    Fn = Window:AddTab({ Title = "Fn Egg", Icon = "target" }),
+    Clover = Window:AddTab({ Title = "Clover", Icon = "star" })
 }
 
--- ================= CREATOR LOG TAB =================
-local LogGroup = Tabs["Creator Log"]:AddLeftGroupbox("Information")
-LogGroup:AddLabel("Webhook with Avatar is active!")
-LogGroup:AddButton({
-    Text = "Test Webhook Now",
-    Func = function()
-        SendWebhook("🔔 Manual Test", "Gipindot ang Test Webhook button.", nil)
-        Library:Notify("Naipadala na ang test sa Discord!", 4)
-    end
+-- ================= CREATOR TAB =================
+Tabs.Creator:AddParagraph({
+    Title = "Developer Information",
+    Content = "Owner: Johnbert\nStatus: Verified Developer (No Key Required)"
 })
 
--- ================= SEND IMAGE TAB =================
-local ImageGroup = Tabs["Send Image"]:AddLeftGroupbox("Send Photo Link & Message")
-local UserMsgInput = ""
-local UserImageInput = ""
-
-ImageGroup:AddInput("MsgInput", {
-    Text = "Type Message",
-    Default = "",
-    Placeholder = "I-type ang mensahe o caption diri...",
-    Numeric = false,
-    Finished = false,
-    Callback = function(Value)
-        UserMsgInput = Value
-    end
+local CountdownParagraph = Tabs.Creator:AddParagraph({
+    Title = "Next Script Update Countdown",
+    Content = "Loading timer..."
 })
 
-ImageGroup:AddInput("ImageInput", {
-    Text = "Paste Image Link (URL)",
-    Default = "",
-    Placeholder = "Ilagay ang Imgur / Image URL diri...",
-    Numeric = false,
-    Finished = false,
-    Callback = function(Value)
-        UserImageInput = Value
-    end
-})
-
-ImageGroup:AddButton({
-    Text = "Send to Discord",
-    Func = function()
-        if (UserMsgInput ~= "" or UserImageInput ~= "") then
-            SendWebhook("🖼️ Custom Image gikan sa User", UserMsgInput ~= "" and UserMsgInput or "Walay mensahe.", UserImageInput)
-            Library:Notify("Tagumpay! Naipadala na sa Discord.", 4)
-        else
-            Library:Notify("Mag-type og mensahe o magbutang og link una!", 3)
+task.spawn(function()
+    while true do
+        local now = os.time()
+        local targetHour = 22
+        local targetMin = 0
+        local dateTable = os.date("*t", now)
+        
+        local targetTable = {
+            year = dateTable.year,
+            month = dateTable.month,
+            day = dateTable.day,
+            hour = targetHour,
+            min = targetMin,
+            sec = 0
+        }
+        local targetTime = os.time(targetTable)
+        
+        if now > targetTime then
+            targetTable.day = targetTable.day + 1
+            targetTime = os.time(targetTable)
         end
+        
+        local diff = targetTime - now
+        
+        if diff > 0 then
+            local hours = math.floor(diff / 3600)
+            local minutes = math.floor((diff % 3600) / 60)
+            local seconds = diff % 60
+            CountdownParagraph:SetDesc(string.format("Update In Alas 10:00: %02dh %02dm %02ds remaining", hours, minutes, seconds))
+        else
+            CountdownParagraph:SetDesc("Update time reached (Alas 10:00)!")
+        end
+        task.wait(1)
+    end
+end)
+
+Tabs.Creator:AddButton({
+    Title = "Copy Discord Link",
+    Description = "Copies community invite link to clipboard.",
+    Callback = function()
+        pcall(function() if setclipboard then setclipboard("https://discord.gg/8CZGc9mXj") end end)
+        Fluent:Notify({ Title = "Discord", Content = "Discord link copied!", Duration = 3 })
     end
 })
 
--- ================= SENA HUB TAB =================
-local SenaGroup = Tabs["Sena Hub"]:AddLeftGroupbox("Sena Hub Options")
-SenaGroup:AddButton({
-    Text = "Execute Sena Hub",
-    Func = function()
-        loadstring(game:HttpGet("https://senahub.xyz/raw/loader"))()
-        Library:Notify("Tagumpay! Gi-execute na ang Sena Hub.", 4)
+-- ================= SCRIPT TABS =================
+Tabs.Lennon:AddButton({
+    Title = "Execute Lennon Hub V3",
+    Description = "Runs Lennon Hub V3 tailored for Steal An Egg.",
+    Callback = function()
+        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/lennonxscripts/lennonhubv3/refs/heads/main/stealanegg.lua"))() end)
+        Fluent:Notify({ Title = "Success", Content = "Executed Lennon Hub V3!", Duration = 3 })
     end
 })
 
--- ================= TAB 1 =================
-local Group1 = Tabs["Steal An Egg 1"]:AddLeftGroupbox("Chilli Hub")
-Group1:AddButton({
-    Text = "Execute This Script",
-    Func = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/Chilli-Hub-Script/refs/heads/main/StealAnEgg"))()
+Tabs.Void:AddButton({
+    Title = "Execute VoidShell Hub",
+    Description = "Loads VoidShell Hub for resource collection.",
+    Callback = function()
+        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidShell-null/VoidShell-Hub/refs/heads/main/Scripts/StealAnEgg.luau"))() end)
+        Fluent:Notify({ Title = "Success", Content = "Executed VoidShell Hub!", Duration = 3 })
     end
 })
 
--- ================= TAB 2 =================
-local Group2 = Tabs["Simple Shader"]:AddLeftGroupbox("Shader Options")
-Group2:AddButton({
-    Text = "Execute This Script",
-    Func = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/robloxscripts2026/simple-shader/refs/heads/main/lua"))()
+Tabs.Ww:AddButton({
+    Title = "Execute Ww Script",
+    Description = "Runs obfuscated utility script.",
+    Callback = function()
+        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/virtuososvisualedits-prog/Ww/refs/heads/main/final-obfuscated.lua"))() end)
+        Fluent:Notify({ Title = "Success", Content = "Executed Ww Script!", Duration = 3 })
     end
 })
 
--- ================= TAB 3 =================
-local Group3 = Tabs["LKZ Hub"]:AddLeftGroupbox("LKZ Loader")
-Group3:AddButton({
-    Text = "Execute This Script",
-    Func = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/LucasggkX/LKZ-Hub/refs/heads/main/Loader.lua"))()
+Tabs.Shaders:AddButton({
+    Title = "Execute Simple Shader",
+    Description = "Applies custom visual filters and lighting.",
+    Callback = function()
+        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/robloxscripts2026/simple-shader/refs/heads/main/lua"))() end)
+        Fluent:Notify({ Title = "Success", Content = "Executed Simple Shader!", Duration = 3 })
     end
 })
 
--- ================= TAB 4 =================
-local Group4 = Tabs["Steal An Egg 2"]:AddLeftGroupbox("SabScript Arch")
-Group4:AddButton({
-    Text = "Execute This Script",
-    Func = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/sabscrip-arch/srver/refs/heads/main/Stealanegg"))()
+Tabs.Pastefy:AddButton({
+    Title = "Execute Pastefy Script",
+    Description = "Fetches and runs external raw scripts.",
+    Callback = function()
+        pcall(function() loadstring(game:HttpGet("https://pastefy.app/YoZocJ8O/raw"))() end)
+        Fluent:Notify({ Title = "Success", Content = "Executed Pastefy Script!", Duration = 3 })
     end
 })
 
--- ================= TAB 5 =================
-local Group5 = Tabs["Pastefy Script"]:AddLeftGroupbox("Pastefy Hub")
-Group5:AddButton({
-    Text = "Execute This Script",
-    Func = function()
-        loadstring(game:HttpGet("https://pastefy.app/YoZocJ8O/raw"))()
+Tabs.Chilli:AddButton({
+    Title = "Execute Chilli Hub",
+    Description = "Runs automated farming routines.",
+    Callback = function()
+        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/Chilli-Hub-Script/refs/heads/main/StealAnEgg"))() end)
+        Fluent:Notify({ Title = "Success", Content = "Executed Chilli Hub!", Duration = 3 })
     end
 })
 
--- ================= TAB 6 =================
-local Group6 = Tabs["ON Hub"]:AddLeftGroupbox("ON Hub")
-Group6:AddButton({
-    Text = "Execute This Script",
-    Func = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/davizin713/ONhub/refs/heads/main/script.lua", true))()
+Tabs.Sab:AddButton({
+    Title = "Execute SabScript Arch",
+    Description = "Deploys automation tools.",
+    Callback = function()
+        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/sabscrip-arch/srver/refs/heads/main/Stealanegg"))() end)
+        Fluent:Notify({ Title = "Success", Content = "Executed SabScript Arch!", Duration = 3 })
     end
 })
 
--- ================= TAB 7 =================
-local Group7 = Tabs["Miranda Steal Eggs"]:AddLeftGroupbox("Miranda Loader")
-Group7:AddButton({
-    Text = "Execute This Script",
-    Func = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/stealaeggs"))()
+Tabs.Miranda:AddButton({
+    Title = "Execute Miranda Loader",
+    Description = "Loads modular script loader.",
+    Callback = function()
+        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/stealaeggs"))() end)
+        Fluent:Notify({ Title = "Success", Content = "Executed Miranda Loader!", Duration = 3 })
     end
 })
 
--- ================= TAB 8 =================
-local Group8 = Tabs["Lennon Hub V2"]:AddLeftGroupbox("Lennon V2")
-Group8:AddButton({
-    Text = "Execute This Script",
-    Func = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/lennonxscripts/lennonhubv2/refs/heads/main/stealaneggv2"))()
+Tabs.LKZ:AddButton({
+    Title = "Execute LKZ Hub",
+    Description = "Injects utility scripts and control menus.",
+    Callback = function()
+        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LucasggkX/LKZ-Hub/refs/heads/main/Loader.lua"))() end)
+        Fluent:Notify({ Title = "Success", Content = "Executed LKZ Hub!", Duration = 3 })
     end
 })
 
--- ================= TAB 9 =================
-local Group9 = Tabs["Solix Hub"]:AddLeftGroupbox("Solix Hub")
-Group9:AddButton({
-    Text = "Execute This Script",
-    Func = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/bao8jl/solixhub/main/loader"))()
+Tabs.Solix:AddButton({
+    Title = "Execute Solix Hub",
+    Description = "Multi-game utility hub.",
+    Callback = function()
+        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/bao8jl/solixhub/main/loader"))() end)
+        Fluent:Notify({ Title = "Success", Content = "Executed Solix Hub!", Duration = 3 })
     end
 })
 
--- ================= TAB 10 =================
-local Group10 = Tabs["BF Loader"]:AddLeftGroupbox("BF Loader")
-Group10:AddButton({
-    Text = "Execute This Script",
-    Func = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/hanniii1/Loader/refs/heads/main/BFLoader.lua"))()
+Tabs.Decode:AddButton({
+    Title = "Execute De:Code",
+    Description = "Executes De:Code script suite.",
+    Callback = function()
+        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/ItzYumi/Decode/refs/heads/main/DE%3ACODE.lua", true))() end)
+        Fluent:Notify({ Title = "Success", Content = "Executed De:Code!", Duration = 3 })
     end
 })
 
--- ================= TAB 11 =================
-local Group11 = Tabs["Lennon Hub V3"]:AddLeftGroupbox("Lennon V3")
-Group11:AddButton({
-    Text = "Execute This Script",
-    Func = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/lennonxscripts/lennonhubv3/refs/heads/main/stealanegg.lua"))()
+Tabs.Fn:AddButton({
+    Title = "Execute Fn Steal An Egg",
+    Description = "Runs specialized routines for eggs.",
+    Callback = function()
+        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"))() end)
+        Fluent:Notify({ Title = "Success", Content = "Executed Fn Steal An Egg!", Duration = 3 })
     end
+})
+
+Tabs.Clover:AddButton({
+    Title = "Execute Clover Hub",
+    Description = "Loads Clover Hub loader.",
+    Callback = function()
+        pcall(function() loadstring(game:HttpGet("https://cloverhub.app/clover.lua"))() end)
+        Fluent:Notify({ Title = "Success", Content = "Executed Clover Hub!", Duration = 3 })
+    end
+})
+
+Fluent:Notify({
+    Title = "Johnbert Hub",
+    Content = "Bounded Draggable Icon Active!",
+    Duration = 4
 })
