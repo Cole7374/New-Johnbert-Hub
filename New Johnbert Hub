@@ -1,0 +1,248 @@
+local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+
+-- ================= WEBHOOK FUNCTION =================
+local WebhookURL = "https://discord.com/api/webhooks/1552664878903205939/nIhoJl-yZrKzYol8kBwMzhKCt-fYlcfLr6AehmafF8_HRVPKvrUCZ-6B3SykbUD05TAv"
+
+local function SendWebhook(title, messageText, imageUrl)
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local HttpService = game:GetService("HttpService")
+    
+    local thumbSuccess, thumbUrl = pcall(function()
+        local content = game:HttpGet("https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. LocalPlayer.UserId .. "&size=420x420&format=Png&isCircular=false")
+        local data = HttpService:JSONDecode(content)
+        return data.data[1].imageUrl
+    end)
+    
+    local avatarImage = thumbSuccess and thumbUrl or ""
+
+    local embed = {
+        ["title"] = title,
+        ["color"] = 16777215, -- White color
+        ["fields"] = {
+            {["name"] = "👤 Username:", ["value"] = LocalPlayer.Name, ["inline"] = true},
+            {["name"] = "🆔 User ID:", ["value"] = tostring(LocalPlayer.UserId), ["inline"] = true},
+            {["name"] = "🎮 Game ID:", ["value"] = tostring(game.PlaceId), ["inline"] = true},
+            {["name"] = "💬 Message:", ["value"] = messageText, ["inline"] = false},
+        },
+        ["thumbnail"] = {
+            ["url"] = avatarImage
+        },
+        ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
+    }
+
+    if imageUrl and imageUrl ~= "" then
+        embed["image"] = {
+            ["url"] = imageUrl
+        }
+    end
+
+    local data = {
+        ["content"] = "",
+        ["embeds"] = {embed}
+    }
+    
+    local json = HttpService:JSONEncode(data)
+    local requestFunc = syn and syn.request or http_request or request or (http and http.request)
+    if requestFunc then
+        pcall(function()
+            requestFunc({
+                Url = WebhookURL,
+                Method = "POST",
+                Headers = {["Content-Type"] = "application/json"},
+                Body = json
+            })
+        end)
+    end
+end
+
+-- Send load log
+pcall(function()
+    SendWebhook("🚀 JohnBert Hub Executed", "Nag-load ang script sa laro.", nil)
+end)
+
+-- ================= UI SETUP =================
+local Window = Library:CreateWindow({
+    Title = 'JohnBert Hub - White Edition',
+    Center = true,
+    AutoShow = true,
+    TabPadding = 8,
+    MenuFadeTime = 0.2
+})
+
+local Tabs = {
+    ["Creator Log"] = Window:AddTab("Creator Log"),
+    ["Send Image"] = Window:AddTab("Send Image"),
+    ["Sena Hub"] = Window:AddTab("Sena Hub"),
+    ["Steal An Egg 1"] = Window:AddTab("Steal An Egg 1"),
+    ["Simple Shader"] = Window:AddTab("Simple Shader"),
+    ["LKZ Hub"] = Window:AddTab("LKZ Hub"),
+    ["Steal An Egg 2"] = Window:AddTab("Steal An Egg 2"),
+    ["Pastefy Script"] = Window:AddTab("Pastefy Script"),
+    ["ON Hub"] = Window:AddTab("ON Hub"),
+    ["Miranda Steal Eggs"] = Window:AddTab("Miranda Steal Eggs"),
+    ["Lennon Hub V2"] = Window:AddTab("Lennon Hub V2"),
+    ["Solix Hub"] = Window:AddTab("Solix Hub"),
+    ["BF Loader"] = Window:AddTab("BF Loader"),
+    ["Lennon Hub V3"] = Window:AddTab("Lennon Hub V3"),
+}
+
+-- ================= CREATOR LOG TAB =================
+local LogGroup = Tabs["Creator Log"]:AddLeftGroupbox("Information")
+LogGroup:AddLabel("Webhook with Avatar is active!")
+LogGroup:AddButton({
+    Text = "Test Webhook Now",
+    Func = function()
+        SendWebhook("🔔 Manual Test", "Gipindot ang Test Webhook button.", nil)
+        Library:Notify("Naipadala na ang test sa Discord!", 4)
+    end
+})
+
+-- ================= SEND IMAGE TAB =================
+local ImageGroup = Tabs["Send Image"]:AddLeftGroupbox("Send Photo Link & Message")
+local UserMsgInput = ""
+local UserImageInput = ""
+
+ImageGroup:AddInput("MsgInput", {
+    Text = "Type Message",
+    Default = "",
+    Placeholder = "I-type ang mensahe o caption diri...",
+    Numeric = false,
+    Finished = false,
+    Callback = function(Value)
+        UserMsgInput = Value
+    end
+})
+
+ImageGroup:AddInput("ImageInput", {
+    Text = "Paste Image Link (URL)",
+    Default = "",
+    Placeholder = "Ilagay ang Imgur / Image URL diri...",
+    Numeric = false,
+    Finished = false,
+    Callback = function(Value)
+        UserImageInput = Value
+    end
+})
+
+ImageGroup:AddButton({
+    Text = "Send to Discord",
+    Func = function()
+        if (UserMsgInput ~= "" or UserImageInput ~= "") then
+            SendWebhook("🖼️ Custom Image gikan sa User", UserMsgInput ~= "" and UserMsgInput or "Walay mensahe.", UserImageInput)
+            Library:Notify("Tagumpay! Naipadala na sa Discord.", 4)
+        else
+            Library:Notify("Mag-type og mensahe o magbutang og link una!", 3)
+        end
+    end
+})
+
+-- ================= SENA HUB TAB =================
+local SenaGroup = Tabs["Sena Hub"]:AddLeftGroupbox("Sena Hub Options")
+SenaGroup:AddButton({
+    Text = "Execute Sena Hub",
+    Func = function()
+        loadstring(game:HttpGet("https://senahub.xyz/raw/loader"))()
+        Library:Notify("Tagumpay! Gi-execute na ang Sena Hub.", 4)
+    end
+})
+
+-- ================= TAB 1 =================
+local Group1 = Tabs["Steal An Egg 1"]:AddLeftGroupbox("Chilli Hub")
+Group1:AddButton({
+    Text = "Execute This Script",
+    Func = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/Chilli-Hub-Script/refs/heads/main/StealAnEgg"))()
+    end
+})
+
+-- ================= TAB 2 =================
+local Group2 = Tabs["Simple Shader"]:AddLeftGroupbox("Shader Options")
+Group2:AddButton({
+    Text = "Execute This Script",
+    Func = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/robloxscripts2026/simple-shader/refs/heads/main/lua"))()
+    end
+})
+
+-- ================= TAB 3 =================
+local Group3 = Tabs["LKZ Hub"]:AddLeftGroupbox("LKZ Loader")
+Group3:AddButton({
+    Text = "Execute This Script",
+    Func = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/LucasggkX/LKZ-Hub/refs/heads/main/Loader.lua"))()
+    end
+})
+
+-- ================= TAB 4 =================
+local Group4 = Tabs["Steal An Egg 2"]:AddLeftGroupbox("SabScript Arch")
+Group4:AddButton({
+    Text = "Execute This Script",
+    Func = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/sabscrip-arch/srver/refs/heads/main/Stealanegg"))()
+    end
+})
+
+-- ================= TAB 5 =================
+local Group5 = Tabs["Pastefy Script"]:AddLeftGroupbox("Pastefy Hub")
+Group5:AddButton({
+    Text = "Execute This Script",
+    Func = function()
+        loadstring(game:HttpGet("https://pastefy.app/YoZocJ8O/raw"))()
+    end
+})
+
+-- ================= TAB 6 =================
+local Group6 = Tabs["ON Hub"]:AddLeftGroupbox("ON Hub")
+Group6:AddButton({
+    Text = "Execute This Script",
+    Func = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/davizin713/ONhub/refs/heads/main/script.lua", true))()
+    end
+})
+
+-- ================= TAB 7 =================
+local Group7 = Tabs["Miranda Steal Eggs"]:AddLeftGroupbox("Miranda Loader")
+Group7:AddButton({
+    Text = "Execute This Script",
+    Func = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/stealaeggs"))()
+    end
+})
+
+-- ================= TAB 8 =================
+local Group8 = Tabs["Lennon Hub V2"]:AddLeftGroupbox("Lennon V2")
+Group8:AddButton({
+    Text = "Execute This Script",
+    Func = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/lennonxscripts/lennonhubv2/refs/heads/main/stealaneggv2"))()
+    end
+})
+
+-- ================= TAB 9 =================
+local Group9 = Tabs["Solix Hub"]:AddLeftGroupbox("Solix Hub")
+Group9:AddButton({
+    Text = "Execute This Script",
+    Func = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bao8jl/solixhub/main/loader"))()
+    end
+})
+
+-- ================= TAB 10 =================
+local Group10 = Tabs["BF Loader"]:AddLeftGroupbox("BF Loader")
+Group10:AddButton({
+    Text = "Execute This Script",
+    Func = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/hanniii1/Loader/refs/heads/main/BFLoader.lua"))()
+    end
+})
+
+-- ================= TAB 11 =================
+local Group11 = Tabs["Lennon Hub V3"]:AddLeftGroupbox("Lennon V3")
+Group11:AddButton({
+    Text = "Execute This Script",
+    Func = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/lennonxscripts/lennonhubv3/refs/heads/main/stealanegg.lua"))()
+    end
+})
