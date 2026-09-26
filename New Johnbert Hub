@@ -1,492 +1,187 @@
--- ================= JOHNBERT HUB - SETTINGS COUNTDOWN (10:00 PM), BOUNDED TOGGLE & CENTERED UI =================
+-- ================= JOHNBERT HUB - COMPACT KICK SHUFFLE UI =================
 local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-local Lighting = game:GetService("Lighting")
+local LocalPlayer = Players.LocalPlayer
 local ProtectedGui = (gethui and gethui()) or CoreGui
 
-if ProtectedGui:FindFirstChild("JohnbertFluentHub") then 
-    ProtectedGui.JohnbertFluentHub:Destroy() 
+if ProtectedGui:FindFirstChild("JohnbertCustomShuffleGui") then 
+    ProtectedGui.JohnbertCustomShuffleGui:Destroy() 
 end
 
-if ProtectedGui:FindFirstChild("JohnbertToggleIcon") then 
-    ProtectedGui.JohnbertToggleIcon:Destroy() 
-end
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "JohnbertCustomShuffleGui"
+ScreenGui.Parent = ProtectedGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.IgnoreGuiInset = true
 
-if ProtectedGui:FindFirstChild("JohnbertLoadingGui") then 
-    ProtectedGui.JohnbertLoadingGui:Destroy() 
-end
+-- Main Frame (Gamay ug Compact nga Size)
+local MainFrame = Instance.new("Frame")
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 20, 25)
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+MainFrame.Size = UDim2.new(0, 310, 0, 330)
+MainFrame.BackgroundTransparency = 0
+MainFrame.Visible = false
 
--- Play Custom Startup Music (No Loop, 100% Volume)
-pcall(function()
-    local MainSound = Instance.new("Sound")
-    MainSound.Name = "JohnBertMainUISound"
-    MainSound.SoundId = "rbxassetid://106806057419587"
-    MainSound.Volume = 1.0 -- 100% Volume
-    MainSound.Looped = false -- No Loop
-    MainSound.Parent = ProtectedGui
-    MainSound:Play()
-end)
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 16)
+MainCorner.Parent = MainFrame
 
--- ================= SMALL ROUNDED LOADING SCREEN =================
-local LoadingGui = Instance.new("ScreenGui")
-LoadingGui.Name = "JohnbertLoadingGui"
-LoadingGui.Parent = ProtectedGui
-LoadingGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-LoadingGui.IgnoreGuiInset = true
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Color = Color3.fromRGB(0, 200, 255)
+MainStroke.Thickness = 2
+MainStroke.Parent = MainFrame
 
-local LoadMainFrame = Instance.new("Frame")
-LoadMainFrame.Name = "LoadMainFrame"
-LoadMainFrame.Parent = LoadingGui
-LoadMainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-LoadMainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-LoadMainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-LoadMainFrame.Size = UDim2.new(0, 260, 0, 180)
+-- Image Holder (Gamay)
+local ImageHolder = Instance.new("Frame")
+ImageHolder.Parent = MainFrame
+ImageHolder.BackgroundTransparency = 1
+ImageHolder.ClipsDescendants = true
+ImageHolder.Position = UDim2.new(0.5, -40, 0.08, 0)
+ImageHolder.Size = UDim2.new(0, 80, 0, 80)
 
-local LoadCorner = Instance.new("UICorner")
-LoadCorner.CornerRadius = UDim.new(0, 16)
-LoadCorner.Parent = LoadMainFrame
+local ImageCorner = Instance.new("UICorner")
+ImageCorner.CornerRadius = UDim.new(0, 16)
+ImageCorner.Parent = ImageHolder
 
-local LoadStroke = Instance.new("UIStroke")
-LoadStroke.Color = Color3.fromRGB(0, 200, 255)
-LoadStroke.Thickness = 2
-LoadStroke.Parent = LoadMainFrame
+local CustomImage = Instance.new("ImageLabel")
+CustomImage.Parent = ImageHolder
+CustomImage.BackgroundTransparency = 1
+CustomImage.Size = UDim2.new(1, 0, 1, 0)
+CustomImage.Image = "rbxassetid://96883917118628"
 
-local LoadIcon = Instance.new("ImageLabel")
-LoadIcon.Name = "LoadIcon"
-LoadIcon.Parent = LoadMainFrame
-LoadIcon.BackgroundTransparency = 1
-LoadIcon.Position = UDim2.new(0.5, -30, 0.15, 0)
-LoadIcon.Size = UDim2.new(0, 60, 0, 60)
-LoadIcon.Image = "rbxassetid://111733635541624"
+-- Notice Text
+local NoticeText = Instance.new("TextLabel")
+NoticeText.Parent = MainFrame
+NoticeText.BackgroundTransparency = 1
+NoticeText.Position = UDim2.new(0, 15, 0.36, 0)
+NoticeText.Size = UDim2.new(0, 280, 0, 60)
+NoticeText.Font = Enum.Font.GothamBold
+NoticeText.Text = "Ang Script Kay Ge Update Pa Sa Gwapo Nga Owner"
+NoticeText.TextColor3 = Color3.fromRGB(255, 255, 255)
+NoticeText.TextSize = 12
+NoticeText.TextWrapped = true
+NoticeText.TextXAlignment = Enum.TextXAlignment.Center
+NoticeText.TextYAlignment = Enum.TextYAlignment.Center
 
-local LoadTitle = Instance.new("TextLabel")
-LoadTitle.Name = "LoadTitle"
-LoadTitle.Parent = LoadMainFrame
-LoadTitle.BackgroundTransparency = 1
-LoadTitle.Position = UDim2.new(0, 10, 0.52, 0)
-LoadTitle.Size = UDim2.new(0, 240, 0, 25)
-LoadTitle.Font = Enum.Font.GothamBold
-LoadTitle.Text = "JOHNBERT HUB"
-LoadTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-LoadTitle.TextSize = 14
+-- Button Container para sa Shuffle
+local ButtonContainer = Instance.new("Frame")
+ButtonContainer.Parent = MainFrame
+ButtonContainer.BackgroundTransparency = 1
+ButtonContainer.Position = UDim2.new(0.1, 0, 0.62, 0)
+ButtonContainer.Size = UDim2.new(0, 248, 0, 95)
 
-local PercentText = Instance.new("TextLabel")
-PercentText.Name = "PercentText"
-PercentText.Parent = LoadMainFrame
-PercentText.BackgroundTransparency = 1
-PercentText.Position = UDim2.new(0, 10, 0.67, 0)
-PercentText.Size = UDim2.new(0, 240, 0, 20)
-PercentText.Font = Enum.Font.GothamMedium
-PercentText.Text = "Loading... 0%"
-PercentText.TextColor3 = Color3.fromRGB(180, 180, 180)
-PercentText.TextSize = 12
+-- OK Button 1 (Green)
+local OkButton1 = Instance.new("TextButton")
+OkButton1.Parent = ButtonContainer
+OkButton1.BackgroundColor3 = Color3.fromRGB(0, 190, 100)
+OkButton1.Size = UDim2.new(0, 248, 0, 40)
+OkButton1.Position = UDim2.new(0, 0, 0, 0)
+OkButton1.Font = Enum.Font.GothamBold
+OkButton1.Text = "OK"
+OkButton1.TextColor3 = Color3.fromRGB(255, 255, 255)
+OkButton1.TextSize = 14
 
-local BarBg = Instance.new("Frame")
-BarBg.Name = "BarBg"
-BarBg.Parent = LoadMainFrame
-BarBg.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-BarBg.Position = UDim2.new(0.1, 0, 0.85, 0)
-BarBg.Size = UDim2.new(0, 208, 0, 8)
+local Ok1Corner = Instance.new("UICorner")
+Ok1Corner.CornerRadius = UDim.new(0, 10)
+Ok1Corner.Parent = OkButton1
 
-local BarBgCorner = Instance.new("UICorner")
-BarBgCorner.CornerRadius = UDim.new(1, 0)
-BarBgCorner.Parent = BarBg
+-- OK Button 2 (Green din, pero isa ani ang mag-kick kung mapislit)
+local OkButton2 = Instance.new("TextButton")
+OkButton2.Parent = ButtonContainer
+OkButton2.BackgroundColor3 = Color3.fromRGB(0, 190, 100)
+OkButton2.Size = UDim2.new(0, 248, 0, 40)
+OkButton2.Position = UDim2.new(0, 0, 0, 50)
+OkButton2.Font = Enum.Font.GothamBold
+OkButton2.Text = "OK"
+OkButton2.TextColor3 = Color3.fromRGB(255, 255, 255)
+OkButton2.TextSize = 14
 
-local BarFill = Instance.new("Frame")
-BarFill.Name = "BarFill"
-BarFill.Parent = BarBg
-BarFill.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
-BarFill.Size = UDim2.new(0, 0, 1, 0)
+local Ok2Corner = Instance.new("UICorner")
+Ok2Corner.CornerRadius = UDim.new(0, 10)
+Ok2Corner.Parent = OkButton2
 
-local BarFillCorner = Instance.new("UICorner")
-BarFillCorner.CornerRadius = UDim.new(1, 0)
-BarFillCorner.Parent = BarFill
+-- Tag iya kung kinsa ang saktong OK button
+local correctButton = nil
 
--- Loading Animation (0 to 100%)
-for i = 0, 100, 2 do
-    BarFill.Size = UDim2.new(i / 100, 0, 1, 0)
-    PercentText.Text = "Loading... " .. i .. "%"
-    task.wait(0.02)
-end
-task.wait(0.3)
-
--- Smooth Fade Out Effect sa Loading Screen
-for i = 0, 1, 0.1 do
-    LoadMainFrame.BackgroundTransparency = i
-    LoadIcon.ImageTransparency = i
-    LoadTitle.TextTransparency = i
-    PercentText.TextTransparency = i
-    BarBg.BackgroundTransparency = i
-    BarFill.BackgroundTransparency = i
-    LoadStroke.Transparency = i
-    task.wait(0.02)
-end
-
-LoadingGui:Destroy()
-
--- ================= TOGGLE ICON (SIDE & DRAGGABLE WITH SCREEN BOUNDS) =================
-local ToggleGui = Instance.new("ScreenGui")
-ToggleGui.Name = "JohnbertToggleIcon"
-ToggleGui.Parent = ProtectedGui
-ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-ToggleGui.IgnoreGuiInset = true
-
-local ToggleButton = Instance.new("ImageButton")
-ToggleButton.Name = "ToggleButton"
-ToggleButton.Parent = ToggleGui
-ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-ToggleButton.Position = UDim2.new(0, 15, 0.5, -27)
-ToggleButton.Size = UDim2.new(0, 55, 0, 55)
-ToggleButton.Image = "rbxassetid://111733635541624"
-ToggleButton.AutoButtonColor = true
-
-local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 12)
-UICorner.Parent = ToggleButton
-
-local UIStroke = Instance.new("UIStroke")
-UIStroke.Color = Color3.fromRGB(0, 200, 255)
-UIStroke.Thickness = 2.5
-UIStroke.Parent = ToggleButton
-
--- Bounded Draggable Script para dili makagawas sa screen
-local dragging, dragInput, dragStart, startPos
-local LocalPlayer = Players.LocalPlayer
-
-ToggleButton.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = ToggleButton.AbsolutePosition
-        
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
+-- Function para sa SHUFFLE
+local function ShuffleButtons()
+    local positions = {
+        UDim2.new(0, 0, 0, 0),
+        UDim2.new(0, 0, 0, 50)
+    }
+    
+    local randPos1 = math.random(1, 2)
+    local randPos2 = (randPos1 == 1) and 2 or 1
+    
+    OkButton1.Position = positions[randPos1]
+    OkButton2.Position = positions[randPos2]
+    
+    -- Randomly pili kung hain ang sakto
+    if math.random(1, 2) == 1 then
+        correctButton = OkButton1
+    else
+        correctButton = OkButton2
     end
-end)
-
-ToggleButton.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-        dragInput = input
-    end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-    if input == dragInput and dragging then
-        local delta = input.Position - dragStart
-        local newX = startPos.X + delta.X
-        local newY = startPos.Y + delta.Y
-        
-        local screenSize = ToggleGui.AbsoluteSize
-        local btnSize = ToggleButton.AbsoluteSize
-        
-        newX = math.clamp(newX, 0, screenSize.X - btnSize.X)
-        newY = math.clamp(newY, 0, screenSize.Y - btnSize.Y)
-        
-        ToggleButton.Position = UDim2.new(0, newX, 0, newY)
-    end
-end)
-
-task.spawn(function()
-    while ToggleButton and ToggleButton.Parent do
-        for i = 0, 1, 0.005 do
-            if not ToggleButton or not ToggleButton.Parent then break end
-            UIStroke.Color = Color3.fromHSV(i, 1, 1)
-            task.wait(0.03)
-        end
-    end
-end)
-
--- ================= FLUENT UI (AQUA THEME & CENTERED WINDOW) =================
-local Success, Fluent = pcall(function()
-    return loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
-end)
-
-if not Success or not Fluent then
-    warn("Failed to load Fluent UI.")
-    return
 end
 
-local Window = Fluent:CreateWindow({
-    Title = "Johnbert Hub | Steal An Egg",
-    SubTitle = "by Johnbert",
-    TabWidth = 100,
-    Size = UDim2.fromOffset(400, 260),
-    Acrylic = false,
-    Theme = "Aqua",
-    MinimizeKey = Enum.KeyCode.LeftControl
+-- BOUNCE ANIMATION sa paggawas
+MainFrame.Visible = true
+MainFrame.Size = UDim2.new(0, 0, 0, 0)
+local bounceTween = TweenService:Create(MainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    Size = UDim2.new(0, 310, 0, 330)
 })
+bounceTween:Play()
 
--- Force Center Alignment para sa Main Window ra gyud
-pcall(function()
-    task.defer(function()
-        task.wait(0.1)
-        for _, gui in ipairs(ProtectedGui:GetChildren()) do
-            if gui:IsA("ScreenGui") and gui ~= ToggleGui and gui.Name ~= "JohnbertLoadingGui" then
-                for _, child in ipairs(gui:GetDescendants()) do
-                    if child:IsA("Frame") and child.Size.X.Offset >= 350 and child.Size.Y.Offset >= 200 then
-                        child.AnchorPoint = Vector2.new(0.5, 0.5)
-                        child.Position = UDim2.new(0.5, 0, 0.5, 0)
-                    end
-                end
-            end
-        end
+ShuffleButtons()
+
+-- Logic sa pagpindot
+local function HandleClick(clickedButton)
+    pcall(function()
+        local ClickSound = Instance.new("Sound")
+        ClickSound.SoundId = "rbxassetid://12221967"
+        ClickSound.Volume = 1.0
+        ClickSound.Parent = ProtectedGui
+        ClickSound:Play()
     end)
-end)
-
-ToggleButton.MouseButton1Click:Connect(function()
-    Window:Minimize()
-end)
-
-local Tabs = {
-    Creator = Window:AddTab({ Title = "Creator", Icon = "user" }),
-    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" }),
-    Lennon = Window:AddTab({ Title = "Lennon", Icon = "terminal" }),
-    Void = Window:AddTab({ Title = "VoidShell", Icon = "box" }),
-    Ww = Window:AddTab({ Title = "Ww", Icon = "code" }),
-    Shaders = Window:AddTab({ Title = "Shaders", Icon = "eye" }),
-    Pastefy = Window:AddTab({ Title = "Pastefy", Icon = "file-text" }),
-    Chilli = Window:AddTab({ Title = "Chilli", Icon = "zap" }),
-    Sab = Window:AddTab({ Title = "SabScript", Icon = "cpu" }),
-    Miranda = Window:AddTab({ Title = "Miranda", Icon = "layers" }),
-    LKZ = Window:AddTab({ Title = "LKZ", Icon = "globe" }),
-    Solix = Window:AddTab({ Title = "Solix", Icon = "shield" }),
-    Decode = Window:AddTab({ Title = "De:Code", Icon = "command" }),
-    Fn = Window:AddTab({ Title = "Fn Egg", Icon = "target" }),
-    Clover = Window:AddTab({ Title = "Clover", Icon = "star" })
-}
-
--- ================= CREATOR TAB =================
-Tabs.Creator:AddParagraph({
-    Title = "Developer Information",
-    Content = "Owner: Johnbert\nStatus: Verified Developer (No Key Required)"
-})
-
-Tabs.Creator:AddButton({
-    Title = "Copy Discord Link",
-    Description = "Copies community invite link to clipboard.",
-    Callback = function()
-        pcall(function() if setclipboard then setclipboard("https://discord.gg/8CZGc9mXj") end end)
-        Fluent:Notify({ Title = "Discord", Content = "Discord link copied!", Duration = 3 })
-    end
-})
-
--- ================= SETTINGS TAB =================
-Tabs.Settings:AddParagraph({
-    Title = "Interface Customization",
-    Content = "Modify UI appearance, themes, textures, and performance."
-})
-
--- Countdown Paragraph (Target: 22:00 / 10:00 PM)
-local CountdownParagraph = Tabs.Settings:AddParagraph({
-    Title = "Script Update Countdown",
-    Content = "Loading timer..."
-})
-
-task.spawn(function()
-    while true do
-        local now = os.time()
-        local targetHour = 22 -- 22:00 o'clock = 10:00 PM sa gabii
-        local targetMin = 0
-        local dateTable = os.date("*t", now)
-        
-        local targetTable = {
-            year = dateTable.year,
-            month = dateTable.month,
-            day = dateTable.day,
-            hour = targetHour,
-            min = targetMin,
-            sec = 0
-        }
-        local targetTime = os.time(targetTable)
-        
-        if now > targetTime then
-            targetTable.day = targetTable.day + 1
-            targetTime = os.time(targetTable)
-        end
-        
-        local diff = targetTime - now
-        
-        if diff > 0 then
-            local hours = math.floor(diff / 3600)
-            local minutes = math.floor((diff % 3600) / 60)
-            local seconds = diff % 60
-            CountdownParagraph:SetDesc(string.format("Update In 10:00 PM: %02dh %02dm %02ds remaining", hours, minutes, seconds))
-        else
-            CountdownParagraph:SetDesc("Update time reached (10:00 PM)!")
-        end
+    
+    if clickedButton == correctButton then
+        -- Sakto ang napindot: Mawala ang UI nga walay buhaton
+        NoticeText.TextColor3 = Color3.fromRGB(0, 255, 120)
+        NoticeText.Text = "Salamat! Ge update pa ang SCRIPT..."
         task.wait(1)
+        
+        local fadeOut = TweenService:Create(MainFrame, TweenInfo.new(0.4), {BackgroundTransparency = 1})
+        fadeOut:Play()
+        fadeOut.Completed:Connect(function()
+            ScreenGui:Destroy()
+        end)
+    else
+        -- Sayop ang napindot: Ma-kick dayon
+        pcall(function()
+            local ErrorSound = Instance.new("Sound")
+            ErrorSound.SoundId = "rbxassetid://138194950178546"
+            ErrorSound.Volume = 1.0
+            ErrorSound.Parent = ProtectedGui
+            ErrorSound.ErrorSound:Play()
+        end)
+        
+        NoticeText.TextColor3 = Color3.fromRGB(255, 50, 50)
+        NoticeText.Text = "Mali ang imong napili nga OK! Gi-kick ka na ni JOHNBERT."
+        task.wait(1.5)
+        
+        pcall(function()
+            LocalPlayer:Kick("Gipislit nimo ang sayop nga OK button! Na-kick ka ni JOHNBERT.")
+        end)
     end
+end
+
+OkButton1.MouseButton1Click:Connect(function()
+    HandleClick(OkButton1)
 end)
 
-local ThemeDropdown = Tabs.Settings:AddDropdown("ThemeDropdown", {
-    Title = "Select Color Theme",
-    Values = {"Dark", "Light", "Amethyst", "Aqua", "Rose"},
-    Default = "Aqua",
-    Callback = function(Value)
-        Fluent:SetTheme(Value)
-        Fluent:Notify({ Title = "Settings", Content = "Theme changed to " .. Value, Duration = 2 })
-    end
-})
-
-local AcrylicToggle = Tabs.Settings:AddToggle("AcrylicToggle", {
-    Title = "Enable Acrylic Texture Style",
-    Description = "Toggles background blur/glass texture effect.",
-    Default = false,
-    Callback = function(Value)
-        Window.Acrylic = Value
-        Fluent:Notify({ Title = "Settings", Content = "Acrylic texture style updated!", Duration = 2 })
-    end
-})
-
-Tabs.Settings:AddButton({
-    Title = "Enable Potato Graphics",
-    Description = "Reduces graphics quality to boost FPS and reduce lag.",
-    Callback = function()
-        pcall(function()
-            workspace.CurrentCamera.FieldOfView = 70
-            Lighting.GlobalShadows = false
-            Lighting.FogEnd = 9e9
-            settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
-            for _, v in ipairs(workspace:GetDescendants()) do
-                if v:IsA("BasePart") then
-                    v.Material = Enum.Material.SmoothPlastic
-                    v.Reflectance = 0
-                elseif v:IsA("Decal") or v:IsA("Texture") then
-                    v.Transparency = 1
-                elseif v:IsA("ParticleEmitter") or v:IsA("Fire") or v:IsA("Smoke") or v:IsA("Sparkles") then
-                    v.Enabled = false
-                end
-            end
-        end)
-        Fluent:Notify({ Title = "Potato Graphics", Content = "Lag reducer applied successfully!", Duration = 3 })
-    end
-})
-
--- ================= SCRIPT TABS =================
-Tabs.Lennon:AddButton({
-    Title = "Execute Lennon Hub V3",
-    Description = "Runs Lennon Hub V3 tailored for Steal An Egg.",
-    Callback = function()
-        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/lennonxscripts/lennonhubv3/refs/heads/main/stealanegg.lua"))() end)
-        Fluent:Notify({ Title = "Success", Content = "Executed Lennon Hub V3!", Duration = 3 })
-    end
-})
-
-Tabs.Void:AddButton({
-    Title = "Execute VoidShell Hub",
-    Description = "Loads VoidShell Hub for resource collection.",
-    Callback = function()
-        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidShell-null/VoidShell-Hub/refs/heads/main/Scripts/StealAnEgg.luau"))() end)
-        Fluent:Notify({ Title = "Success", Content = "Executed VoidShell Hub!", Duration = 3 })
-    end
-})
-
-Tabs.Ww:AddButton({
-    Title = "Execute Ww Script",
-    Description = "Runs obfuscated utility script.",
-    Callback = function()
-        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/virtuososvisualedits-prog/Ww/refs/heads/main/final-obfuscated.lua"))() end)
-        Fluent:Notify({ Title = "Success", Content = "Executed Ww Script!", Duration = 3 })
-    end
-})
-
-Tabs.Shaders:AddButton({
-    Title = "Execute Simple Shader",
-    Description = "Applies custom visual filters and lighting.",
-    Callback = function()
-        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/robloxscripts2026/simple-shader/refs/heads/main/lua"))() end)
-        Fluent:Notify({ Title = "Success", Content = "Executed Simple Shader!", Duration = 3 })
-    end
-})
-
-Tabs.Pastefy:AddButton({
-    Title = "Execute Pastefy Script",
-    Description = "Fetches and runs external raw scripts.",
-    Callback = function()
-        pcall(function() loadstring(game:HttpGet("https://pastefy.app/YoZocJ8O/raw"))() end)
-        Fluent:Notify({ Title = "Success", Content = "Executed Pastefy Script!", Duration = 3 })
-    end
-})
-
-Tabs.Chilli:AddButton({
-    Title = "Execute Chilli Hub",
-    Description = "Runs automated farming routines.",
-    Callback = function()
-        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/Chilli-Hub-Script/refs/heads/main/StealAnEgg"))() end)
-        Fluent:Notify({ Title = "Success", Content = "Executed Chilli Hub!", Duration = 3 })
-    end
-})
-
-Tabs.Sab:AddButton({
-    Title = "Execute SabScript Arch",
-    Description = "Deploys automation tools.",
-    Callback = function()
-        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/sabscrip-arch/srver/refs/heads/main/Stealanegg"))() end)
-        Fluent:Notify({ Title = "Success", Content = "Executed SabScript Arch!", Duration = 3 })
-    end
-})
-
-Tabs.Miranda:AddButton({
-    Title = "Execute Miranda Loader",
-    Description = "Loads modular script loader.",
-    Callback = function()
-        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/stealaeggs"))() end)
-        Fluent:Notify({ Title = "Success", Content = "Executed Miranda Loader!", Duration = 3 })
-    end
-})
-
-Tabs.LKZ:AddButton({
-    Title = "Execute LKZ Hub",
-    Description = "Injects utility scripts and control menus.",
-    Callback = function()
-        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LucasggkX/LKZ-Hub/refs/heads/main/Loader.lua"))() end)
-        Fluent:Notify({ Title = "Success", Content = "Executed LKZ Hub!", Duration = 3 })
-    end
-})
-
-Tabs.Solix:AddButton({
-    Title = "Execute Solix Hub",
-    Description = "Multi-game utility hub.",
-    Callback = function()
-        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/bao8jl/solixhub/main/loader"))() end)
-        Fluent:Notify({ Title = "Success", Content = "Executed Solix Hub!", Duration = 3 })
-    end
-})
-
-Tabs.Decode:AddButton({
-    Title = "Execute De:Code",
-    Description = "Executes De:Code script suite.",
-    Callback = function()
-        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/ItzYumi/Decode/refs/heads/main/DE%3ACODE.lua", true))() end)
-        Fluent:Notify({ Title = "Success", Content = "Executed De:Code!", Duration = 3 })
-    end
-})
-
-Tabs.Fn:AddButton({
-    Title = "Execute Fn Steal An Egg",
-    Description = "Runs specialized routines for eggs.",
-    Callback = function()
-        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"))() end)
-        Fluent:Notify({ Title = "Success", Content = "Executed Fn Steal An Egg!", Duration = 3 })
-    end
-})
-
-Tabs.Clover:AddButton({
-    Title = "Execute Clover Hub",
-    Description = "Loads Clover Hub loader.",
-    Callback = function()
-        pcall(function() loadstring(game:HttpGet("https://cloverhub.app/clover.lua"))() end)
-        Fluent:Notify({ Title = "Success", Content = "Executed Clover Hub!", Duration = 3 })
-    end
-})
-
-Fluent:Notify({
-    Title = "Johnbert Hub",
-    Content = "Fully loaded! 10:00 PM Countdown active in Settings.",
-    Duration = 4
-})
+OkButton2.MouseButton1Click:Connect(function()
+    HandleClick(OkButton2)
+end)
