@@ -1,8 +1,9 @@
--- ================= JOHNBERT HUB - FLUENT UI + BOUNDED DRAGGABLE TOGGLE ICON =================
+-- ================= JOHNBERT HUB - SETTINGS COUNTDOWN (10:00 PM), BOUNDED TOGGLE & CENTERED UI =================
 local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
+local Lighting = game:GetService("Lighting")
 local ProtectedGui = (gethui and gethui()) or CoreGui
 
 if ProtectedGui:FindFirstChild("JohnbertFluentHub") then 
@@ -13,43 +14,146 @@ if ProtectedGui:FindFirstChild("JohnbertToggleIcon") then
     ProtectedGui.JohnbertToggleIcon:Destroy() 
 end
 
--- Play startup sound
+if ProtectedGui:FindFirstChild("JohnbertLoadingGui") then 
+    ProtectedGui.JohnbertLoadingGui:Destroy() 
+end
+
+-- Play Custom Startup Music (No Loop, 100% Volume)
 pcall(function()
     local MainSound = Instance.new("Sound")
     MainSound.Name = "JohnBertMainUISound"
-    MainSound.SoundId = "rbxassetid://135062039022934"
-    MainSound.Volume = 0.7
+    MainSound.SoundId = "rbxassetid://106806057419587"
+    MainSound.Volume = 1.0 -- 100% Volume
+    MainSound.Looped = false -- No Loop
     MainSound.Parent = ProtectedGui
     MainSound:Play()
 end)
 
--- Create Bounded Draggable Toggle Icon (Square rounded, no sharp edges)
+-- ================= SMALL ROUNDED LOADING SCREEN =================
+local LoadingGui = Instance.new("ScreenGui")
+LoadingGui.Name = "JohnbertLoadingGui"
+LoadingGui.Parent = ProtectedGui
+LoadingGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+LoadingGui.IgnoreGuiInset = true
+
+local LoadMainFrame = Instance.new("Frame")
+LoadMainFrame.Name = "LoadMainFrame"
+LoadMainFrame.Parent = LoadingGui
+LoadMainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+LoadMainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+LoadMainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+LoadMainFrame.Size = UDim2.new(0, 260, 0, 180)
+
+local LoadCorner = Instance.new("UICorner")
+LoadCorner.CornerRadius = UDim.new(0, 16)
+LoadCorner.Parent = LoadMainFrame
+
+local LoadStroke = Instance.new("UIStroke")
+LoadStroke.Color = Color3.fromRGB(0, 200, 255)
+LoadStroke.Thickness = 2
+LoadStroke.Parent = LoadMainFrame
+
+local LoadIcon = Instance.new("ImageLabel")
+LoadIcon.Name = "LoadIcon"
+LoadIcon.Parent = LoadMainFrame
+LoadIcon.BackgroundTransparency = 1
+LoadIcon.Position = UDim2.new(0.5, -30, 0.15, 0)
+LoadIcon.Size = UDim2.new(0, 60, 0, 60)
+LoadIcon.Image = "rbxassetid://111733635541624"
+
+local LoadTitle = Instance.new("TextLabel")
+LoadTitle.Name = "LoadTitle"
+LoadTitle.Parent = LoadMainFrame
+LoadTitle.BackgroundTransparency = 1
+LoadTitle.Position = UDim2.new(0, 10, 0.52, 0)
+LoadTitle.Size = UDim2.new(0, 240, 0, 25)
+LoadTitle.Font = Enum.Font.GothamBold
+LoadTitle.Text = "JOHNBERT HUB"
+LoadTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+LoadTitle.TextSize = 14
+
+local PercentText = Instance.new("TextLabel")
+PercentText.Name = "PercentText"
+PercentText.Parent = LoadMainFrame
+PercentText.BackgroundTransparency = 1
+PercentText.Position = UDim2.new(0, 10, 0.67, 0)
+PercentText.Size = UDim2.new(0, 240, 0, 20)
+PercentText.Font = Enum.Font.GothamMedium
+PercentText.Text = "Loading... 0%"
+PercentText.TextColor3 = Color3.fromRGB(180, 180, 180)
+PercentText.TextSize = 12
+
+local BarBg = Instance.new("Frame")
+BarBg.Name = "BarBg"
+BarBg.Parent = LoadMainFrame
+BarBg.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+BarBg.Position = UDim2.new(0.1, 0, 0.85, 0)
+BarBg.Size = UDim2.new(0, 208, 0, 8)
+
+local BarBgCorner = Instance.new("UICorner")
+BarBgCorner.CornerRadius = UDim.new(1, 0)
+BarBgCorner.Parent = BarBg
+
+local BarFill = Instance.new("Frame")
+BarFill.Name = "BarFill"
+BarFill.Parent = BarBg
+BarFill.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
+BarFill.Size = UDim2.new(0, 0, 1, 0)
+
+local BarFillCorner = Instance.new("UICorner")
+BarFillCorner.CornerRadius = UDim.new(1, 0)
+BarFillCorner.Parent = BarFill
+
+-- Loading Animation (0 to 100%)
+for i = 0, 100, 2 do
+    BarFill.Size = UDim2.new(i / 100, 0, 1, 0)
+    PercentText.Text = "Loading... " .. i .. "%"
+    task.wait(0.02)
+end
+task.wait(0.3)
+
+-- Smooth Fade Out Effect sa Loading Screen
+for i = 0, 1, 0.1 do
+    LoadMainFrame.BackgroundTransparency = i
+    LoadIcon.ImageTransparency = i
+    LoadTitle.TextTransparency = i
+    PercentText.TextTransparency = i
+    BarBg.BackgroundTransparency = i
+    BarFill.BackgroundTransparency = i
+    LoadStroke.Transparency = i
+    task.wait(0.02)
+end
+
+LoadingGui:Destroy()
+
+-- ================= TOGGLE ICON (SIDE & DRAGGABLE WITH SCREEN BOUNDS) =================
 local ToggleGui = Instance.new("ScreenGui")
 ToggleGui.Name = "JohnbertToggleIcon"
 ToggleGui.Parent = ProtectedGui
 ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ToggleGui.IgnoreGuiInset = true
 
 local ToggleButton = Instance.new("ImageButton")
 ToggleButton.Name = "ToggleButton"
 ToggleButton.Parent = ToggleGui
 ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-ToggleButton.Position = UDim2.new(0.05, 0, 0.1, 0)
-ToggleButton.Size = UDim2.new(0, 50, 0, 50)
-ToggleButton.Image = "rbxassetid://95829563639545"
+ToggleButton.Position = UDim2.new(0, 15, 0.5, -27)
+ToggleButton.Size = UDim2.new(0, 55, 0, 55)
+ToggleButton.Image = "rbxassetid://111733635541624"
 ToggleButton.AutoButtonColor = true
 
 local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 12) -- Rounded square shape, walay hait
+UICorner.CornerRadius = UDim.new(0, 12)
 UICorner.Parent = ToggleButton
 
 local UIStroke = Instance.new("UIStroke")
-UIStroke.Color = Color3.fromRGB(100, 100, 255)
-UIStroke.Thickness = 2
+UIStroke.Color = Color3.fromRGB(0, 200, 255)
+UIStroke.Thickness = 2.5
 UIStroke.Parent = ToggleButton
 
--- Draggable Logic with Screen Boundary Restriction (Bawal maka-gawas sa screen)
-local dragging = false
-local dragInput, dragStart, startPos
+-- Bounded Draggable Script para dili makagawas sa screen
+local dragging, dragInput, dragStart, startPos
+local LocalPlayer = Players.LocalPlayer
 
 ToggleButton.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -65,25 +169,39 @@ ToggleButton.InputBegan:Connect(function(input)
     end
 end)
 
+ToggleButton.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
 UserInputService.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+    if input == dragInput and dragging then
         local delta = input.Position - dragStart
         local newX = startPos.X + delta.X
         local newY = startPos.Y + delta.Y
         
-        -- Kuhaon ang size sa screen aron dili gyud ma-awas
-        local viewportSize = ToggleGui.AbsoluteSize
-        local maxX = viewportSize.X - ToggleButton.AbsoluteSize.X
-        local maxY = viewportSize.Y - ToggleButton.AbsoluteSize.Y
+        local screenSize = ToggleGui.AbsoluteSize
+        local btnSize = ToggleButton.AbsoluteSize
         
-        -- I-clamp ang posisyon aron naa ra gyud sa sulod sa screen
-        newX = math.clamp(newX, 0, maxX)
-        newY = math.clamp(newY, 0, maxY)
+        newX = math.clamp(newX, 0, screenSize.X - btnSize.X)
+        newY = math.clamp(newY, 0, screenSize.Y - btnSize.Y)
         
         ToggleButton.Position = UDim2.new(0, newX, 0, newY)
     end
 end)
 
+task.spawn(function()
+    while ToggleButton and ToggleButton.Parent do
+        for i = 0, 1, 0.005 do
+            if not ToggleButton or not ToggleButton.Parent then break end
+            UIStroke.Color = Color3.fromHSV(i, 1, 1)
+            task.wait(0.03)
+        end
+    end
+end)
+
+-- ================= FLUENT UI (AQUA THEME & CENTERED WINDOW) =================
 local Success, Fluent = pcall(function()
     return loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 end)
@@ -96,20 +214,37 @@ end
 local Window = Fluent:CreateWindow({
     Title = "Johnbert Hub | Steal An Egg",
     SubTitle = "by Johnbert",
-    TabWidth = 110,
-    Size = UDim2.fromOffset(450, 280), -- Tama-tama ra ang size sa cellphone
+    TabWidth = 100,
+    Size = UDim2.fromOffset(400, 260),
     Acrylic = false,
-    Theme = "Dark",
+    Theme = "Aqua",
     MinimizeKey = Enum.KeyCode.LeftControl
 })
 
--- Toggle UI Visibility when clicking the floating icon
+-- Force Center Alignment para sa Main Window ra gyud
+pcall(function()
+    task.defer(function()
+        task.wait(0.1)
+        for _, gui in ipairs(ProtectedGui:GetChildren()) do
+            if gui:IsA("ScreenGui") and gui ~= ToggleGui and gui.Name ~= "JohnbertLoadingGui" then
+                for _, child in ipairs(gui:GetDescendants()) do
+                    if child:IsA("Frame") and child.Size.X.Offset >= 350 and child.Size.Y.Offset >= 200 then
+                        child.AnchorPoint = Vector2.new(0.5, 0.5)
+                        child.Position = UDim2.new(0.5, 0, 0.5, 0)
+                    end
+                end
+            end
+        end
+    end)
+end)
+
 ToggleButton.MouseButton1Click:Connect(function()
     Window:Minimize()
 end)
 
 local Tabs = {
     Creator = Window:AddTab({ Title = "Creator", Icon = "user" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" }),
     Lennon = Window:AddTab({ Title = "Lennon", Icon = "terminal" }),
     Void = Window:AddTab({ Title = "VoidShell", Icon = "box" }),
     Ww = Window:AddTab({ Title = "Ww", Icon = "code" }),
@@ -131,15 +266,31 @@ Tabs.Creator:AddParagraph({
     Content = "Owner: Johnbert\nStatus: Verified Developer (No Key Required)"
 })
 
-local CountdownParagraph = Tabs.Creator:AddParagraph({
-    Title = "Next Script Update Countdown",
+Tabs.Creator:AddButton({
+    Title = "Copy Discord Link",
+    Description = "Copies community invite link to clipboard.",
+    Callback = function()
+        pcall(function() if setclipboard then setclipboard("https://discord.gg/8CZGc9mXj") end end)
+        Fluent:Notify({ Title = "Discord", Content = "Discord link copied!", Duration = 3 })
+    end
+})
+
+-- ================= SETTINGS TAB =================
+Tabs.Settings:AddParagraph({
+    Title = "Interface Customization",
+    Content = "Modify UI appearance, themes, textures, and performance."
+})
+
+-- Countdown Paragraph (Target: 22:00 / 10:00 PM)
+local CountdownParagraph = Tabs.Settings:AddParagraph({
+    Title = "Script Update Countdown",
     Content = "Loading timer..."
 })
 
 task.spawn(function()
     while true do
         local now = os.time()
-        local targetHour = 22
+        local targetHour = 22 -- 22:00 o'clock = 10:00 PM sa gabii
         local targetMin = 0
         local dateTable = os.date("*t", now)
         
@@ -164,20 +315,55 @@ task.spawn(function()
             local hours = math.floor(diff / 3600)
             local minutes = math.floor((diff % 3600) / 60)
             local seconds = diff % 60
-            CountdownParagraph:SetDesc(string.format("Update In Alas 10:00: %02dh %02dm %02ds remaining", hours, minutes, seconds))
+            CountdownParagraph:SetDesc(string.format("Update In 10:00 PM: %02dh %02dm %02ds remaining", hours, minutes, seconds))
         else
-            CountdownParagraph:SetDesc("Update time reached (Alas 10:00)!")
+            CountdownParagraph:SetDesc("Update time reached (10:00 PM)!")
         end
         task.wait(1)
     end
 end)
 
-Tabs.Creator:AddButton({
-    Title = "Copy Discord Link",
-    Description = "Copies community invite link to clipboard.",
+local ThemeDropdown = Tabs.Settings:AddDropdown("ThemeDropdown", {
+    Title = "Select Color Theme",
+    Values = {"Dark", "Light", "Amethyst", "Aqua", "Rose"},
+    Default = "Aqua",
+    Callback = function(Value)
+        Fluent:SetTheme(Value)
+        Fluent:Notify({ Title = "Settings", Content = "Theme changed to " .. Value, Duration = 2 })
+    end
+})
+
+local AcrylicToggle = Tabs.Settings:AddToggle("AcrylicToggle", {
+    Title = "Enable Acrylic Texture Style",
+    Description = "Toggles background blur/glass texture effect.",
+    Default = false,
+    Callback = function(Value)
+        Window.Acrylic = Value
+        Fluent:Notify({ Title = "Settings", Content = "Acrylic texture style updated!", Duration = 2 })
+    end
+})
+
+Tabs.Settings:AddButton({
+    Title = "Enable Potato Graphics",
+    Description = "Reduces graphics quality to boost FPS and reduce lag.",
     Callback = function()
-        pcall(function() if setclipboard then setclipboard("https://discord.gg/8CZGc9mXj") end end)
-        Fluent:Notify({ Title = "Discord", Content = "Discord link copied!", Duration = 3 })
+        pcall(function()
+            workspace.CurrentCamera.FieldOfView = 70
+            Lighting.GlobalShadows = false
+            Lighting.FogEnd = 9e9
+            settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+            for _, v in ipairs(workspace:GetDescendants()) do
+                if v:IsA("BasePart") then
+                    v.Material = Enum.Material.SmoothPlastic
+                    v.Reflectance = 0
+                elseif v:IsA("Decal") or v:IsA("Texture") then
+                    v.Transparency = 1
+                elseif v:IsA("ParticleEmitter") or v:IsA("Fire") or v:IsA("Smoke") or v:IsA("Sparkles") then
+                    v.Enabled = false
+                end
+            end
+        end)
+        Fluent:Notify({ Title = "Potato Graphics", Content = "Lag reducer applied successfully!", Duration = 3 })
     end
 })
 
@@ -301,6 +487,6 @@ Tabs.Clover:AddButton({
 
 Fluent:Notify({
     Title = "Johnbert Hub",
-    Content = "Bounded Draggable Icon Active!",
+    Content = "Fully loaded! 10:00 PM Countdown active in Settings.",
     Duration = 4
 })
