@@ -22,7 +22,7 @@ pcall(function()
     BgMusic.Name = "ReneBaterboniaBackgroundMusic"
     BgMusic.SoundId = "rbxassetid://113377354243758"
     BgMusic.Volume = 0.8
-    BgMusic.Looped = false -- Walay loop, mo-play kausa ra
+    BgMusic.Looped = false
     BgMusic.Parent = ProtectedGui
     BgMusic:Play()
 end)
@@ -76,7 +76,7 @@ local function MakeDraggable(guiObject)
     end)
 end
 
--- ================= FLOATING TOGGLE ICON (+10 Size) =================
+-- ================= FLOATING TOGGLE ICON =================
 local ToggleButton = Instance.new("ImageButton")
 ToggleButton.Parent = ToggleGui
 ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 30, 55)
@@ -166,7 +166,7 @@ Sidebar.BackgroundColor3 = Color3.fromRGB(15, 28, 50)
 Sidebar.BackgroundTransparency = 0.4
 Sidebar.Position = UDim2.new(0, 6, 0, 30)
 Sidebar.Size = UDim2.new(0, 105, 0, 212)
-Sidebar.CanvasSize = UDim2.new(0, 0, 1.5, 0)
+Sidebar.CanvasSize = UDim2.new(0, 0, 2.0, 0)
 Sidebar.ScrollBarThickness = 2
 Sidebar.BorderSizePixel = 0
 
@@ -208,7 +208,7 @@ local function CreateTab(name)
     TabPage.Parent = ContentArea
     TabPage.BackgroundTransparency = 1
     TabPage.Size = UDim2.new(1, 0, 1, 0)
-    TabPage.CanvasSize = UDim2.new(0, 0, 2.0, 0)
+    TabPage.CanvasSize = UDim2.new(0, 0, 3.5, 0)
     TabPage.ScrollBarThickness = 2
     TabPage.Visible = false
     TabPage.BorderSizePixel = 0
@@ -275,6 +275,8 @@ local function AddParagraph(tab, title, content)
     Desc.TextSize = 9
     Desc.TextXAlignment = Enum.TextXAlignment.Left
     Desc.TextWrapped = true
+
+    return Desc
 end
 
 local function AddButton(tab, name, callback)
@@ -356,8 +358,57 @@ AddButton(TabAccounts, "Copy Instagram Account", function()
     if setclipboard then setclipboard("https://www.instagram.com/valenzonajohnbert22") end
 end)
 
+-- ================= PRIVATE SERVER TAB (LOCKED) =================
+local TabPrivateServer = CreateTab("Private Server")
+AddParagraph(TabPrivateServer, "Server Browser (LOCKED)", "Status: COMMING SOON... (Dili pa magamit sa pagkakaron)")
+
+local LockedFrame = Instance.new("Frame")
+LockedFrame.Parent = TabPrivateServer
+LockedFrame.BackgroundColor3 = Color3.fromRGB(18, 35, 60)
+LockedFrame.BackgroundTransparency = 0.3
+LockedFrame.Size = UDim2.new(0, 286, 0, 45)
+
+local LockedCorner = Instance.new("UICorner")
+LockedCorner.CornerRadius = UDim.new(0, 5)
+LockedCorner.Parent = LockedFrame
+
+local LockedLabel = Instance.new("TextLabel")
+LockedLabel.Parent = LockedFrame
+LockedLabel.BackgroundTransparency = 1
+LockedLabel.Size = UDim2.new(1, 0, 1, 0)
+LockedLabel.Font = Enum.Font.GothamBold
+LockedLabel.Text = "🔒 COMMING SOON..."
+LockedLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+LockedLabel.TextSize = 12
+LockedLabel.TextXAlignment = Enum.TextXAlignment.Center
+
+-- ================= SETTINGS TAB =================
 local TabSettings = CreateTab("Settings")
-AddParagraph(TabSettings, "Steal An Egg Admin Abuse", "Target Start Time: Alas 11:00 sa gabii.")
+local CountdownDesc = AddParagraph(TabSettings, "Steal An Egg Admin Abuse", "Calculating countdown...")
+
+-- Live Countdown Task to 11:00 PM
+task.spawn(function()
+    while true do
+        local t = os.date("*t")
+        local currentSeconds = t.hour * 3600 + t.min * 60 + t.sec
+        local targetSeconds = 23 * 3600
+        
+        local diff = targetSeconds - currentSeconds
+        if diff < 0 then
+            diff = diff + 86400
+        end
+        
+        local hours = math.floor(diff / 3600)
+        local minutes = math.floor((diff % 3600) / 60)
+        local seconds = diff % 60
+        
+        if CountdownDesc and CountdownDesc.Parent then
+            CountdownDesc.Text = string.format("Countdown to 11:00 PM: %02d:%02d:%02d", hours, minutes, seconds)
+        end
+        task.wait(1)
+    end
+end)
+
 AddButton(TabSettings, "Enable Potato Graphics", function()
     workspace.CurrentCamera.FieldOfView = 70
     Lighting.GlobalShadows = false
