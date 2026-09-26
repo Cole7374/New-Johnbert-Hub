@@ -136,6 +136,7 @@ TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 TitleLabel.TextSize = 11
 TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 
+-- Close Button (X) - Now hides MainFrame instead of destroying everything
 local CloseButton = Instance.new("TextButton")
 CloseButton.Parent = TopBar
 CloseButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
@@ -208,7 +209,7 @@ local function CreateTab(name)
     TabPage.Parent = ContentArea
     TabPage.BackgroundTransparency = 1
     TabPage.Size = UDim2.new(1, 0, 1, 0)
-    TabPage.CanvasSize = UDim2.new(0, 0, 3.5, 0)
+    TabPage.CanvasSize = UDim2.new(0, 0, 2.0, 0)
     TabPage.ScrollBarThickness = 2
     TabPage.Visible = false
     TabPage.BorderSizePixel = 0
@@ -347,7 +348,7 @@ AddParagraph(TabCreator, "Developer Info", "Official Hub Owner & Creator.")
 
 -- ACCOUNTS TAB
 local TabAccounts = CreateTab("Accounts")
-AddParagraph(TabAccounts, "Social Media Links", "I-click aron ma-copy sa clipboard.")
+AddParagraph(TabAccounts, "Social Media Links", "Click to copy link to clipboard.")
 AddButton(TabAccounts, "Copy TikTok Account", function()
     if setclipboard then setclipboard("tiktok.com/@valenzonajohnbert") end
 end)
@@ -360,7 +361,7 @@ end)
 
 -- ================= PRIVATE SERVER TAB (LOCKED) =================
 local TabPrivateServer = CreateTab("Private Server")
-AddParagraph(TabPrivateServer, "Server Browser (LOCKED)", "Status: COMMING SOON... (Dili pa magamit sa pagkakaron)")
+AddParagraph(TabPrivateServer, "Server Browser (LOCKED)", "Status: COMING SOON... (Not available yet)")
 
 local LockedFrame = Instance.new("Frame")
 LockedFrame.Parent = TabPrivateServer
@@ -377,7 +378,7 @@ LockedLabel.Parent = LockedFrame
 LockedLabel.BackgroundTransparency = 1
 LockedLabel.Size = UDim2.new(1, 0, 1, 0)
 LockedLabel.Font = Enum.Font.GothamBold
-LockedLabel.Text = "🔒 COMMING SOON..."
+LockedLabel.Text = "🔒 COMING SOON..."
 LockedLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
 LockedLabel.TextSize = 12
 LockedLabel.TextXAlignment = Enum.TextXAlignment.Center
@@ -421,8 +422,11 @@ end)
 
 -- ================= STEAL AN EGG TAB (ALL SCRIPTS) =================
 local TabStealEgg = CreateTab("Steal An Egg")
-AddParagraph(TabStealEgg, "Steal An Egg Hubs", "Pilia ang gusto nimo i-execute.")
+AddParagraph(TabStealEgg, "Steal An Egg Hubs", "Select your preferred hub to execute.")
 
+AddButton(TabStealEgg, "Execute LKZ Hub", function()
+    pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LucasggkX/LKZ-Hub/refs/heads/main/Loader.lua"))() end)
+end)
 AddButton(TabStealEgg, "Execute Bee Hub", function()
     pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/beehub044/Beehub/refs/heads/main/BEE%20HUB%20IS%20BACK"))() end)
 end)
