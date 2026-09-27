@@ -1,104 +1,163 @@
 -- Owner: 09donperds11 (JOHNBERT)
--- Hub: RENE BATERBONIA - Update Notice (Icon Only & Kick)
+-- Hub: RENE BATERBONIA HUB - Steal An Egg (Rayfield UI with Hidden Key)
 
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "RENE BATERBONIA HUB | JOHNBERT",
+   LoadingTitle = "Rene Baterbonia Hub",
+   LoadingSubtitle = "by 09donperds11",
+   ConfigurationSaving = {
+      Enabled = false,
+      FolderName = nil,
+      FileName = "ReneBaterboniaHub"
+   },
+   Discord = {
+      Enabled = false,
+      Invite = "noinvite",
+      RememberJoins = true
+   },
+   KeySystem = true,
+   KeySettings = {
+      Title = "Key System",
+      Subtitle = "Ibutang ang Key para ma-access ang Hub",
+      Note = "Pangitaa ang key o kuhaa kini gikan sa tag-iya.",
+      FileName = "ReneHubKey",
+      SaveKey = true,
+      GrabKeyFromSite = false,
+      Key = {"Key"} -- Gitago na ang pagka-reveal sa note, pero mao gihapon kini ang husto nga key
+   }
+})
+
+-- Background Music
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local Lighting = game:GetService("Lighting")
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+local Camera = workspace.CurrentCamera
 
--- Limpyohi ang lumang Guis ug Tunog
 pcall(function()
     for _, v in ipairs(PlayerGui:GetChildren()) do
-        if v.Name == "ReneUpdateNotice" or v.Name == "ReneMusic" then
-            v:Destroy()
-        end
+        if v.Name == "ReneMusic" then v:Destroy() end
     end
 end)
 
--- Background Intro Music
-local BgMusic = nil
-pcall(function()
-    BgMusic = Instance.new("Sound", PlayerGui)
-    BgMusic.Name = "ReneMusic"
-    BgMusic.SoundId = "rbxassetid://1849159987"
-    BgMusic.Volume = 0.5
-    BgMusic.Looped = true
-    BgMusic:Play()
-end)
+local BgMusic = Instance.new("Sound", PlayerGui)
+BgMusic.Name = "ReneMusic"
+BgMusic.SoundId = "rbxassetid://1849159987"
+BgMusic.Volume = 0.5
+BgMusic.Looped = true
+BgMusic:Play()
 
--- Click Sound
-local function PlayClickSound()
-    pcall(function()
-        local ClickSound = Instance.new("Sound", PlayerGui)
-        ClickSound.SoundId = "rbxassetid://102702078778790"
-        ClickSound.Volume = 1.0
-        ClickSound:Play()
-        game:GetService("Debris"):AddItem(ClickSound, 2)
-    end)
-end
+-- Tabs
+local TabCreator = Window:CreateTab("Creator", 4483362458)
+local TabMusic = Window:CreateTab("Music", 4483362458)
+local TabAccounts = Window:CreateTab("Accounts", 4483362458)
+local TabPrivateServer = Window:CreateTab("Private Server", 4483362458)
+local TabSettings = Window:CreateTab("Settings", 4483362458)
+local TabStealEgg = Window:CreateTab("Steal An Egg", 4483362458)
 
--- =========================================================================
--- UPDATE NOTICE POP-UP (Icon + Text + OK Button = Kick)
--- =========================================================================
-local NoticeGui = Instance.new("ScreenGui", PlayerGui)
-NoticeGui.Name = "ReneUpdateNotice"
-NoticeGui.IgnoreGuiInset = true
-NoticeGui.ResetOnSpawn = false
+-- Creator Tab Content
+TabCreator:CreateSection("Developer Info")
+TabCreator:CreateParagraph({Title = "Owner & Creator", Content = "Official Hub Owner: 09donperds11 (JOHNBERT)"})
+TabCreator:CreateButton({
+   Name = "Copy Username",
+   Callback = function()
+      if setclipboard then setclipboard("09donperds11") end
+   end,
+})
 
-local NoticeOverlay = Instance.new("Frame", NoticeGui)
-NoticeOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-NoticeOverlay.BackgroundTransparency = 0.6
-NoticeOverlay.Size = UDim2.new(1, 0, 1, 0)
+-- Music Tab Content
+TabMusic:CreateSection("Background Music Player")
+TabMusic:CreateButton({
+   Name = "▶ Play Music",
+   Callback = function() if BgMusic then BgMusic:Play() end end,
+})
+TabMusic:CreateButton({
+   Name = "⏸ Pause Music",
+   Callback = function() if BgMusic then BgMusic:Pause() end end,
+})
+TabMusic:CreateButton({
+   Name = "🔊 Volume Up (+0.2)",
+   Callback = function() if BgMusic then BgMusic.Volume = math.clamp(BgMusic.Volume + 0.2, 0, 1) end end,
+})
+TabMusic:CreateButton({
+   Name = "🔉 Volume Down (-0.2)",
+   Callback = function() if BgMusic then BgMusic.Volume = math.clamp(BgMusic.Volume - 0.2, 0, 1) end end,
+})
 
-local NoticeFrame = Instance.new("Frame", NoticeOverlay)
-NoticeFrame.BackgroundColor3 = Color3.fromRGB(20, 18, 30)
-NoticeFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-NoticeFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-NoticeFrame.Size = UDim2.new(0, 340, 0, 190)
-Instance.new("UICorner", NoticeFrame).CornerRadius = UDim.new(0, 10)
-local NoticeStroke = Instance.new("UIStroke", NoticeFrame)
-NoticeStroke.Color = Color3.fromRGB(150, 90, 255)
-NoticeStroke.Thickness = 2
+-- Accounts Tab Content
+TabAccounts:CreateSection("Social Media Links")
+TabAccounts:CreateButton({
+   Name = "Copy TikTok Page: @valenzonajohnbert",
+   Callback = function() if setclipboard then setclipboard("tiktok.com/@valenzonajohnbert") end end,
+})
+TabAccounts:CreateButton({
+   Name = "Copy Facebook Page Link",
+   Callback = function() if setclipboard then setclipboard("https://www.facebook.com/profile.php?id=61584512375546") end end,
+})
+TabAccounts:CreateButton({
+   Name = "Copy Instagram Page Link",
+   Callback = function() if setclipboard then setclipboard("https://www.instagram.com/valenzonajohnbert22") end end,
+})
 
--- Icon sa taas
-local IconLabel = Instance.new("TextLabel", NoticeFrame)
-IconLabel.BackgroundTransparency = 1
-IconLabel.Position = UDim2.new(0, 0, 0, 12)
-IconLabel.Size = UDim2.new(1, 0, 0, 30)
-IconLabel.Font = Enum.Font.GothamBold
-IconLabel.Text = "👑"
-IconLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-IconLabel.TextSize = 22
+-- Private Server Tab Content
+TabPrivateServer:CreateSection("Server Browser")
+TabPrivateServer:CreateButton({
+   Name = "Join Available Server (Player > 0)",
+   Callback = function()
+      task.spawn(function()
+          pcall(function()
+              local cursor = ""
+              local servers = {}
+              repeat
+                  local url = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100" .. (cursor ~= "" and "&cursor=" .. cursor or "")
+                  local data = HttpService:JSONDecode(game:HttpGet(url))
+                  for _, s in ipairs(data.data) do
+                      if s.playing and s.playing > 0 and s.playing < s.maxPlayers and s.id ~= game.JobId then
+                          table.insert(servers, s.id)
+                      end
+                  end
+                  cursor = data.nextPageCursor
+              until #servers > 0 or not cursor
 
-local NoticeTitle = Instance.new("TextLabel", NoticeFrame)
-NoticeTitle.BackgroundTransparency = 1
-NoticeTitle.Position = UDim2.new(0, 20, 0, 48)
-NoticeTitle.Size = UDim2.new(1, -40, 0, 20)
-NoticeTitle.Font = Enum.Font.GothamBold
-NoticeTitle.Text = "RENE BATERBONIA HUB"
-NoticeTitle.TextColor3 = Color3.fromRGB(255, 215, 0)
-NoticeTitle.TextSize = 13
+              if #servers > 0 then
+                  TeleportService:TeleportToPlaceInstance(game.PlaceId, servers[math.random(1, #servers)], LocalPlayer)
+              end
+          end)
+      end)
+   end,
+})
 
-local NoticeDesc = Instance.new("TextLabel", NoticeFrame)
-NoticeDesc.BackgroundTransparency = 1
-NoticeDesc.Position = UDim2.new(0, 20, 0, 75)
-NoticeDesc.Size = UDim2.new(1, -40, 0, 45)
-NoticeDesc.Font = Enum.Font.GothamMedium
-NoticeDesc.Text = "Gi-update pa ang SCRIPT sa gwapo!\nPalihog paghulat samtang ginapauswag pa kini."
-NoticeDesc.TextColor3 = Color3.fromRGB(220, 210, 240)
-NoticeDesc.TextSize = 12
-NoticeDesc.TextWrapped = true
+-- Settings Tab Content
+TabSettings:CreateSection("Optimization")
+TabSettings:CreateButton({
+   Name = "Enable Potato Graphics",
+   Callback = function()
+      Camera.FieldOfView = 70
+      Lighting.GlobalShadows = false
+      Lighting.FogEnd = 9e9
+      for _, v in ipairs(workspace:GetDescendants()) do
+          if v:IsA("BasePart") then v.Material = Enum.Material.SmoothPlastic v.Reflectance = 0
+          elseif v:IsA("Decal") or v:IsA("Texture") then v.Transparency = 1 end
+      end
+   end,
+})
 
-local OkButton = Instance.new("TextButton", NoticeFrame)
-OkButton.BackgroundColor3 = Color3.fromRGB(120, 50, 200)
-OkButton.Position = UDim2.new(0.5, -60, 0, 132)
-OkButton.Size = UDim2.new(0, 120, 0, 34)
-OkButton.Font = Enum.Font.GothamBold
-OkButton.Text = "OK"
-OkButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-OkButton.TextSize = 13
-Instance.new("UICorner", OkButton).CornerRadius = UDim.new(0, 6)
+-- Steal An Egg Tab Content
+TabStealEgg:CreateSection("Steal An Egg Hubs")
+TabStealEgg:CreateButton({ Name = "Execute LKZ Hub", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LucasggkX/LKZ-Hub/refs/heads/main/Loader.lua"))() end })
+TabStealEgg:CreateButton({ Name = "Execute Bee Hub", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/beehub044/Beehub/refs/heads/main/BEE%20HUB%20IS%20BACK"))() end })
+TabStealEgg:CreateButton({ Name = "Execute ZeroIn Hub", Callback = function() loadstring(game:HttpGet("https://zeroinhub.com/api/script"))() end })
+TabStealEgg:CreateButton({ Name = "Execute Sena Hub", Callback = function() loadstring(game:HttpGet("https://senahub.xyz/raw/loader"))() end })
+TabStealEgg:Button({ Name = "Execute Ww Script", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/virtuososvisualedits-prog/Ww/refs/heads/main/final-obfuscated.lua"))() end })
+TabStealEgg:CreateButton({ Name = "Execute SabScript Arch", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/sabscrip-arch/srver/refs/heads/main/Stealanegg"))() end })
+TabStealEgg:CreateButton({ Name = "Execute Lennon Hub V3", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/lennonxscripts/lennonhubv3/refs/heads/main/stealanegg.lua"))() end })
+TabStealEgg:CreateButton({ Name = "Execute VoidShell Hub", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidShell-null/VoidShell-Hub/refs/heads/main/Scripts/StealAnEgg.luau"))() end })
+TabStealEgg:CreateButton({ Name = "Execute Chilli Hub", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/Chilli-Hub-Script/refs/heads/main/StealAnEgg"))() end })
+TabStealEgg:CreateButton({ Name = "Execute Miranda Loader", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/stealaeggs"))() end })
+TabStealEgg:CreateButton({ Name = "Execute Fn Steal An Egg", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"))() end })
 
-OkButton.MouseButton1Click:Connect(function()
-    PlayClickSound()
-    LocalPlayer:Kick("\n[RENE BATERBONIA HUB]\nGisirhan ang dula tungod kay gi-update pa ang script sa gwapo (JOHNBERT).")
-end)
+Rayfield:LoadConfiguration()
