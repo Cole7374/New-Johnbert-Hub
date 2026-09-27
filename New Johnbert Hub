@@ -1,476 +1,104 @@
 -- Owner: 09donperds11 (JOHNBERT)
--- Hub: RENE BATERBONIA HUB - Steal An Egg (No Emotes Version)
+-- Hub: RENE BATERBONIA - Update Notice (Icon Only & Kick)
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-local UserInputService = game:GetService("UserInputService")
-local Lighting = game:GetService("Lighting")
-local TeleportService = game:GetService("TeleportService")
-local HttpService = game:GetService("HttpService")
-local Camera = workspace.CurrentCamera
 
 -- Limpyohi ang lumang Guis ug Tunog
 pcall(function()
     for _, v in ipairs(PlayerGui:GetChildren()) do
-        if v.Name == "ReneStealAnEggMain" or v.Name == "ReneStealAnEggToggle" or v.Name == "ReneClickSound" or v.Name == "ReneMusic" then
+        if v.Name == "ReneUpdateNotice" or v.Name == "ReneMusic" then
             v:Destroy()
         end
     end
 end)
 
 -- Background Intro Music
+local BgMusic = nil
 pcall(function()
-    local BgMusic = Instance.new("Sound", PlayerGui)
+    BgMusic = Instance.new("Sound", PlayerGui)
     BgMusic.Name = "ReneMusic"
-    BgMusic.SoundId = "rbxassetid://113377354243758"
-    BgMusic.Volume = 0.8
-    BgMusic.Looped = false
+    BgMusic.SoundId = "rbxassetid://1849159987"
+    BgMusic.Volume = 0.5
+    BgMusic.Looped = true
     BgMusic:Play()
 end)
 
--- Click Sound Function
+-- Click Sound
 local function PlayClickSound()
     pcall(function()
         local ClickSound = Instance.new("Sound", PlayerGui)
-        ClickSound.Name = "ReneClickSound"
         ClickSound.SoundId = "rbxassetid://102702078778790"
         ClickSound.Volume = 1.0
-        ClickSound.Looped = false
         ClickSound:Play()
-        ClickSound.Ended:Connect(function()
-            ClickSound:Destroy()
-        end)
+        game:GetService("Debris"):AddItem(ClickSound, 2)
     end)
 end
 
-local ScreenGui = Instance.new("ScreenGui", PlayerGui)
-ScreenGui.Name = "ReneStealAnEggMain"
-ScreenGui.IgnoreGuiInset = true
-ScreenGui.ResetOnSpawn = false
-ScreenGui.DisplayOrder = 1999999
+-- =========================================================================
+-- UPDATE NOTICE POP-UP (Icon + Text + OK Button = Kick)
+-- =========================================================================
+local NoticeGui = Instance.new("ScreenGui", PlayerGui)
+NoticeGui.Name = "ReneUpdateNotice"
+NoticeGui.IgnoreGuiInset = true
+NoticeGui.ResetOnSpawn = false
 
-local ToggleGui = Instance.new("ScreenGui", PlayerGui)
-ToggleGui.Name = "ReneStealAnEggToggle"
-ToggleGui.IgnoreGuiInset = true
-ToggleGui.ResetOnSpawn = false
-ToggleGui.DisplayOrder = 1999999
+local NoticeOverlay = Instance.new("Frame", NoticeGui)
+NoticeOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+NoticeOverlay.BackgroundTransparency = 0.6
+NoticeOverlay.Size = UDim2.new(1, 0, 1, 0)
 
-local isUILocked = false
+local NoticeFrame = Instance.new("Frame", NoticeOverlay)
+NoticeFrame.BackgroundColor3 = Color3.fromRGB(20, 18, 30)
+NoticeFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+NoticeFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+NoticeFrame.Size = UDim2.new(0, 340, 0, 190)
+Instance.new("UICorner", NoticeFrame).CornerRadius = UDim.new(0, 10)
+local NoticeStroke = Instance.new("UIStroke", NoticeFrame)
+NoticeStroke.Color = Color3.fromRGB(150, 90, 255)
+NoticeStroke.Thickness = 2
 
-local function MakeDraggable(guiObject)
-    local dragging, dragStart, startPos
-    guiObject.InputBegan:Connect(function(input)
-        if isUILocked then return end
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = guiObject.Position
-        end
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if isUILocked then return end
-        if dragging and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-            local delta = input.Position - dragStart
-            guiObject.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
-    UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = false
-        end
-    end)
-end
+-- Icon sa taas
+local IconLabel = Instance.new("TextLabel", NoticeFrame)
+IconLabel.BackgroundTransparency = 1
+IconLabel.Position = UDim2.new(0, 0, 0, 12)
+IconLabel.Size = UDim2.new(1, 0, 0, 30)
+IconLabel.Font = Enum.Font.GothamBold
+IconLabel.Text = "👑"
+IconLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+IconLabel.TextSize = 22
 
-local MainFrame = Instance.new("Frame", ScreenGui)
-MainFrame.BackgroundColor3 = Color3.fromRGB(10, 20, 38)
-MainFrame.BackgroundTransparency = 0.25
-MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-MainFrame.Size = UDim2.new(0, 420, 0, 275)
-MainFrame.Visible = true
-Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
-local MainStroke = Instance.new("UIStroke", MainFrame)
-MainStroke.Color = Color3.fromRGB(0, 160, 255)
-MainStroke.Thickness = 1.5
-MakeDraggable(MainFrame)
+local NoticeTitle = Instance.new("TextLabel", NoticeFrame)
+NoticeTitle.BackgroundTransparency = 1
+NoticeTitle.Position = UDim2.new(0, 20, 0, 48)
+NoticeTitle.Size = UDim2.new(1, -40, 0, 20)
+NoticeTitle.Font = Enum.Font.GothamBold
+NoticeTitle.Text = "RENE BATERBONIA HUB"
+NoticeTitle.TextColor3 = Color3.fromRGB(255, 215, 0)
+NoticeTitle.TextSize = 13
 
--- Image Icon para sa Toggle Button
-local ToggleButton = Instance.new("ImageButton", ToggleGui)
-ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 30, 55)
-ToggleButton.BackgroundTransparency = 0.35
-ToggleButton.Position = UDim2.new(0.02, 0, 0.4, 0)
-ToggleButton.Size = UDim2.new(0, 46, 0, 46)
-ToggleButton.Image = "rbxassetid://108764707174374"
-ToggleButton.Visible = false
-Instance.new("UICorner", ToggleButton).CornerRadius = UDim.new(1, 0)
-local ToggleStroke = Instance.new("UIStroke", ToggleButton)
-ToggleStroke.Color = Color3.fromRGB(0, 180, 255)
-ToggleStroke.Thickness = 2
-MakeDraggable(ToggleButton)
+local NoticeDesc = Instance.new("TextLabel", NoticeFrame)
+NoticeDesc.BackgroundTransparency = 1
+NoticeDesc.Position = UDim2.new(0, 20, 0, 75)
+NoticeDesc.Size = UDim2.new(1, -40, 0, 45)
+NoticeDesc.Font = Enum.Font.GothamMedium
+NoticeDesc.Text = "Gi-update pa ang SCRIPT sa gwapo!\nPalihog paghulat samtang ginapauswag pa kini."
+NoticeDesc.TextColor3 = Color3.fromRGB(220, 210, 240)
+NoticeDesc.TextSize = 12
+NoticeDesc.TextWrapped = true
 
-ToggleButton.MouseButton1Click:Connect(function()
+local OkButton = Instance.new("TextButton", NoticeFrame)
+OkButton.BackgroundColor3 = Color3.fromRGB(120, 50, 200)
+OkButton.Position = UDim2.new(0.5, -60, 0, 132)
+OkButton.Size = UDim2.new(0, 120, 0, 34)
+OkButton.Font = Enum.Font.GothamBold
+OkButton.Text = "OK"
+OkButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+OkButton.TextSize = 13
+Instance.new("UICorner", OkButton).CornerRadius = UDim.new(0, 6)
+
+OkButton.MouseButton1Click:Connect(function()
     PlayClickSound()
-    MainFrame.Visible = true
-    ToggleButton.Visible = false
+    LocalPlayer:Kick("\n[RENE BATERBONIA HUB]\nGisirhan ang dula tungod kay gi-update pa ang script sa gwapo (JOHNBERT).")
 end)
-
-local TopBar = Instance.new("Frame", MainFrame)
-TopBar.BackgroundTransparency = 1
-TopBar.Size = UDim2.new(1, 0, 0, 28)
-
-local TitleLabel = Instance.new("TextLabel", TopBar)
-TitleLabel.BackgroundTransparency = 1
-TitleLabel.Position = UDim2.new(0, 10, 0, 0)
-TitleLabel.Size = UDim2.new(0, 210, 1, 0)
-TitleLabel.Font = Enum.Font.GothamBold
-TitleLabel.Text = "RENE BATERBONIA HUB - Steal An Egg"
-TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-TitleLabel.TextSize = 10
-TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-
-local DateTimeLabel = Instance.new("TextLabel", TopBar)
-DateTimeLabel.BackgroundTransparency = 1
-DateTimeLabel.Position = UDim2.new(0, 222, 0, 0)
-DateTimeLabel.Size = UDim2.new(0, 170, 1, 0)
-DateTimeLabel.Font = Enum.Font.Gotham
-DateTimeLabel.Text = ""
-DateTimeLabel.TextColor3 = Color3.fromRGB(0, 220, 255)
-DateTimeLabel.TextSize = 9
-DateTimeLabel.TextXAlignment = Enum.TextXAlignment.Right
-
-task.spawn(function()
-    while MainFrame and MainFrame.Parent do
-        pcall(function()
-            DateTimeLabel.Text = os.date("%b %d, %Y - %I:%M:%S %p")
-        end)
-        task.wait(1)
-    end
-end)
-
-local CloseButton = Instance.new("TextButton", TopBar)
-CloseButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-CloseButton.BackgroundTransparency = 0.45
-CloseButton.Position = UDim2.new(1, -26, 0.5, -9)
-CloseButton.Size = UDim2.new(0, 18, 0, 18)
-CloseButton.Font = Enum.Font.GothamBold
-CloseButton.Text = "X"
-CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseButton.TextSize = 10
-Instance.new("UICorner", CloseButton).CornerRadius = UDim.new(1, 0)
-
-CloseButton.MouseButton1Click:Connect(function() 
-    PlayClickSound()
-    MainFrame.Visible = false 
-    ToggleButton.Visible = true
-end)
-
-local SearchLabel = Instance.new("TextLabel", MainFrame)
-SearchLabel.BackgroundColor3 = Color3.fromRGB(15, 28, 50)
-SearchLabel.BackgroundTransparency = 0.45
-SearchLabel.Position = UDim2.new(0, 116, 0, 30)
-SearchLabel.Size = UDim2.new(0, 298, 0, 22)
-SearchLabel.Font = Enum.Font.GothamBold
-SearchLabel.Text = "🔍 SEARCH - COMING SOON"
-SearchLabel.TextColor3 = Color3.fromRGB(255, 180, 50)
-SearchLabel.TextSize = 9
-Instance.new("UICorner", SearchLabel).CornerRadius = UDim.new(0, 5)
-
-local Sidebar = Instance.new("ScrollingFrame", MainFrame)
-Sidebar.BackgroundColor3 = Color3.fromRGB(15, 28, 50)
-Sidebar.BackgroundTransparency = 0.55
-Sidebar.Position = UDim2.new(0, 6, 0, 56)
-Sidebar.Size = UDim2.new(0, 105, 0, 210)
-Sidebar.CanvasSize = UDim2.new(0, 0, 2.2, 0)
-Sidebar.ScrollBarThickness = 2
-Sidebar.BorderSizePixel = 0
-Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 6)
-local SidebarLayout = Instance.new("UIListLayout", Sidebar)
-SidebarLayout.SortOrder = Enum.SortOrder.LayoutOrder
-SidebarLayout.Padding = UDim.new(0, 3)
-
-local ContentArea = Instance.new("Frame", MainFrame)
-ContentArea.BackgroundTransparency = 1
-ContentArea.Position = UDim2.new(0, 116, 0, 56)
-ContentArea.Size = UDim2.new(0, 298, 0, 210)
-
-local tabsList = {}
-local activeTab = nil
-
-local function CreateTab(name)
-    local TabButton = Instance.new("TextButton", Sidebar)
-    TabButton.BackgroundColor3 = Color3.fromRGB(18, 40, 70)
-    TabButton.BackgroundTransparency = 0.65
-    TabButton.Size = UDim2.new(0, 97, 0, 24)
-    TabButton.Font = Enum.Font.GothamMedium
-    TabButton.Text = name
-    TabButton.TextColor3 = Color3.fromRGB(220, 235, 255)
-    TabButton.TextSize = 10
-    Instance.new("UICorner", TabButton).CornerRadius = UDim.new(0, 5)
-
-    local TabPage = Instance.new("ScrollingFrame", ContentArea)
-    TabPage.Name = name
-    TabPage.BackgroundTransparency = 1
-    TabPage.Size = UDim2.new(1, 0, 1, 0)
-    TabPage.CanvasSize = UDim2.new(0, 0, 2.5, 0)
-    TabPage.ScrollBarThickness = 2
-    TabPage.Visible = false
-    TabPage.BorderSizePixel = 0
-    local PageLayout = Instance.new("UIListLayout", TabPage)
-    PageLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    PageLayout.Padding = UDim.new(0, 5)
-
-    TabButton.MouseButton1Click:Connect(function()
-        PlayClickSound()
-        for _, page in pairs(tabsList) do 
-            page.Visible = false 
-        end
-        TabPage.Visible = true
-        activeTab = TabPage
-    end)
-
-    if not activeTab then
-        TabPage.Visible = true
-        activeTab = TabPage
-    end
-
-    table.insert(tabsList, TabPage)
-    return TabPage
-end
-
-local function AddParagraph(tab, title, content)
-    local Frame = Instance.new("Frame", tab)
-    Frame.BackgroundColor3 = Color3.fromRGB(18, 35, 60)
-    Frame.BackgroundTransparency = 0.45
-    Frame.Size = UDim2.new(0, 286, 0, 42)
-    Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 5)
-
-    local Title = Instance.new("TextLabel", Frame)
-    Title.BackgroundTransparency = 1
-    Title.Position = UDim2.new(0, 6, 0, 3)
-    Title.Size = UDim2.new(0, 274, 0, 15)
-    Title.Font = Enum.Font.GothamBold
-    Title.Text = title
-    Title.TextColor3 = Color3.fromRGB(0, 200, 255)
-    Title.TextSize = 10
-    Title.TextXAlignment = Enum.TextXAlignment.Left
-
-    local Desc = Instance.new("TextLabel", Frame)
-    Desc.BackgroundTransparency = 1
-    Desc.Position = UDim2.new(0, 6, 0, 18)
-    Desc.Size = UDim2.new(0, 274, 0, 20)
-    Desc.Font = Enum.Font.Gotham
-    Desc.Text = content
-    Desc.TextColor3 = Color3.fromRGB(220, 230, 255)
-    Desc.TextSize = 9
-    Desc.TextXAlignment = Enum.TextXAlignment.Left
-    Desc.TextWrapped = true
-    return Desc
-end
-
-local function AddButton(tab, name, callback)
-    local Btn = Instance.new("TextButton", tab)
-    Btn.BackgroundColor3 = Color3.fromRGB(0, 120, 210)
-    Btn.BackgroundTransparency = 0.35
-    Btn.Size = UDim2.new(0, 286, 0, 26)
-    Btn.Font = Enum.Font.GothamBold
-    Btn.Text = name
-    Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Btn.TextSize = 10
-    Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 5)
-    Btn.MouseButton1Click:Connect(function()
-        PlayClickSound()
-        callback()
-    end)
-end
-
--- Creator Tab
-local TabCreator = CreateTab("Creator")
-AddParagraph(TabCreator, "Developer Info", "Official Hub Owner & Creator: 09donperds11 (JOHNBERT)")
-
-local Card = Instance.new("Frame", TabCreator)
-Card.BackgroundColor3 = Color3.fromRGB(18, 35, 60)
-Card.BackgroundTransparency = 0.45
-Card.Size = UDim2.new(0, 286, 0, 55)
-Instance.new("UICorner", Card).CornerRadius = UDim.new(0, 5)
-
-local AvatarImg = Instance.new("ImageLabel", Card)
-AvatarImg.BackgroundTransparency = 1
-AvatarImg.Position = UDim2.new(0, 6, 0, 5)
-AvatarImg.Size = UDim2.new(0, 45, 0, 45)
-AvatarImg.Image = "rbxthumb://type=AvatarHeadShot&id=8064284458&w=150&h=150"
-Instance.new("UICorner", AvatarImg).CornerRadius = UDim.new(1, 0)
-
-local NameLbl = Instance.new("TextLabel", Card)
-NameLbl.BackgroundTransparency = 1
-NameLbl.Position = UDim2.new(0, 58, 0, 8)
-NameLbl.Size = UDim2.new(0, 220, 0, 18)
-NameLbl.Font = Enum.Font.GothamBold
-NameLbl.Text = "09donperds11 (JOHNBERT)"
-NameLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
-NameLbl.TextSize = 10
-NameLbl.TextXAlignment = Enum.TextXAlignment.Left
-
-local CopyBtn = Instance.new("TextButton", Card)
-CopyBtn.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
-CopyBtn.BackgroundTransparency = 0.35
-CopyBtn.Position = UDim2.new(0, 58, 0, 28)
-CopyBtn.Size = UDim2.new(0, 220, 0, 20)
-CopyBtn.Font = Enum.Font.GothamBold
-CopyBtn.Text = "Copy Username"
-CopyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-CopyBtn.TextSize = 9
-Instance.new("UICorner", CopyBtn).CornerRadius = UDim.new(0, 4)
-
-CopyBtn.MouseButton1Click:Connect(function()
-    PlayClickSound()
-    if setclipboard then
-        setclipboard("09donperds11")
-    end
-end)
-
--- Accounts Tab
-local TabAccounts = CreateTab("Accounts")
-AddParagraph(TabAccounts, "Social Media Links", "Message or visit me on my official pages!")
-AddButton(TabAccounts, "Copy TikTok Page: @valenzonajohnbert", function() if setclipboard then setclipboard("tiktok.com/@valenzonajohnbert") end end)
-AddButton(TabAccounts, "Copy Facebook Page Link", function() if setclipboard then setclipboard("https://www.facebook.com/profile.php?id=61584512375546") end end)
-AddButton(TabAccounts, "Copy Instagram Page Link", function() if setclipboard then setclipboard("https://www.instagram.com/valenzonajohnbert22") end end)
-AddButton(TabAccounts, "✨ COMING SOON: More Socials", function() end)
-
--- Private Server Tab
-local TabPrivateServer = CreateTab("Private Server")
-local ServerStatusDesc = AddParagraph(TabPrivateServer, "Server Browser (UNLOCKED)", "Status: Ready to join available servers...")
-AddButton(TabPrivateServer, "Join Available Server (Player > 0)", function()
-    ServerStatusDesc.Text = "Searching for a valid server..."
-    task.spawn(function()
-        pcall(function()
-            local cursor = ""
-            local servers = {}
-            repeat
-                local url = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100" .. (cursor ~= "" and "&cursor=" .. cursor or "")
-                local data = HttpService:JSONDecode(game:HttpGet(url))
-                for _, s in ipairs(data.data) do
-                    if s.playing and s.playing > 0 and s.playing < s.maxPlayers and s.id ~= game.JobId then
-                        table.insert(servers, s.id)
-                    end
-                end
-                cursor = data.nextPageCursor
-            until #servers > 0 or not cursor
-
-            if #servers > 0 then
-                ServerStatusDesc.Text = "Server found! Teleporting..."
-                TeleportService:TeleportToPlaceInstance(game.PlaceId, servers[math.random(1, #servers)], LocalPlayer)
-            else
-                ServerStatusDesc.Text = "No valid servers found."
-            end
-        end)
-    end)
-end)
-
--- Settings Tab
-local TabSettings = CreateTab("Settings")
-local PovContainer = Instance.new("Frame", TabSettings)
-PovContainer.BackgroundColor3 = Color3.fromRGB(18, 35, 60)
-PovContainer.BackgroundTransparency = 0.45
-PovContainer.Size = UDim2.new(0, 286, 0, 75)
-Instance.new("UICorner", PovContainer).CornerRadius = UDim.new(0, 5)
-
-local PovTitle = Instance.new("TextLabel", PovContainer)
-PovTitle.BackgroundTransparency = 1
-PovTitle.Position = UDim2.new(0, 8, 0, 5)
-PovTitle.Size = UDim2.new(0, 270, 0, 18)
-PovTitle.Font = Enum.Font.GothamBold
-PovTitle.Text = "📷 Field of View (POV) Changer: 70"
-PovTitle.TextColor3 = Color3.fromRGB(0, 200, 255)
-PovTitle.TextSize = 10
-PovTitle.TextXAlignment = Enum.TextXAlignment.Left
-
-for i, val in ipairs({70, 85, 100, 110, 120}) do
-    local povBtn = Instance.new("TextButton", PovContainer)
-    povBtn.BackgroundColor3 = Color3.fromRGB(25, 45, 75)
-    povBtn.BackgroundTransparency = 0.35
-    povBtn.Position = UDim2.new(0, 8 + ((i-1) * 54), 0, 28)
-    povBtn.Size = UDim2.new(0, 50, 0, 24)
-    povBtn.Font = Enum.Font.GothamBold
-    povBtn.Text = tostring(val)
-    povBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    povBtn.TextSize = 9
-    Instance.new("UICorner", povBtn).CornerRadius = UDim.new(0, 4)
-    povBtn.MouseButton1Click:Connect(function()
-        PlayClickSound()
-        Camera.FieldOfView = val
-        PovTitle.Text = "📷 Field of View (POV) Changer: " .. tostring(val)
-    end)
-end
-
-AddButton(TabSettings, "Enable Potato Graphics", function()
-    Camera.FieldOfView = 70
-    Lighting.GlobalShadows = false
-    Lighting.FogEnd = 9e9
-    for _, v in ipairs(workspace:GetDescendants()) do
-        if v:IsA("BasePart") then v.Material = Enum.Material.SmoothPlastic v.Reflectance = 0
-        elseif v:IsA("Decal") or v:IsA("Texture") then v.Transparency = 1 end
-    end
-end)
-
--- Config Tab
-local TabConfig = CreateTab("Config")
-local ConfigDesc = AddParagraph(TabConfig, "Configuration Manager", "Save or Load your preferred UI settings.")
-local configFile = "ReneBaterboniaHub_Config.json"
-
-local LockButton = Instance.new("TextButton", TabConfig)
-LockButton.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
-LockButton.BackgroundTransparency = 0.35
-LockButton.Size = UDim2.new(0, 286, 0, 26)
-LockButton.Font = Enum.Font.GothamBold
-LockButton.Text = "🔒 UI Status: UNLOCKED (Click to Lock)"
-LockButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-LockButton.TextSize = 10
-Instance.new("UICorner", LockButton).CornerRadius = UDim.new(0, 5)
-
-LockButton.MouseButton1Click:Connect(function()
-    PlayClickSound()
-    isUILocked = not isUILocked
-    if isUILocked then
-        LockButton.BackgroundColor3 = Color3.fromRGB(50, 180, 50)
-        LockButton.Text = "🔒 UI Status: LOCKED (Click to Unlock)"
-    else
-        LockButton.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
-        LockButton.Text = "🔓 UI Status: UNLOCKED (Click to Lock)"
-    end
-end)
-
-AddButton(TabConfig, "💾 Save Current Config", function()
-    pcall(function()
-        if writefile then
-            writefile(configFile, HttpService:JSONEncode({FOV = Camera.FieldOfView, Locked = isUILocked}))
-            ConfigDesc.Text = "Status: Config successfully saved!"
-        end
-    end)
-end)
-
-AddButton(TabConfig, "📂 Load Saved Config", function()
-    pcall(function()
-        if readfile and isfile and isfile(configFile) then
-            local data = HttpService:JSONDecode(readfile(configFile))
-            if data.FOV then Camera.FieldOfView = data.FOV PovTitle.Text = "📷 Field of View (POV) Changer: " .. tostring(data.FOV) end
-            if data.Locked ~= nil then isUILocked = data.Locked end
-            ConfigDesc.Text = "Status: Config successfully loaded!"
-        end
-    end)
-end)
-
--- Steal An Egg Tab
-local TabStealEgg = CreateTab("Steal An Egg")
-AddParagraph(TabStealEgg, "Steal An Egg Hubs", "Select your preferred hub to execute.")
-AddButton(TabStealEgg, "Execute LKZ Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LucasggkX/LKZ-Hub/refs/heads/main/Loader.lua"))() end)
-AddButton(TabStealEgg, "Execute Bee Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/beehub044/Beehub/refs/heads/main/BEE%20HUB%20IS%20BACK"))() end)
-AddButton(TabStealEgg, "Execute ZeroIn Hub", function() loadstring(game:HttpGet("https://zeroinhub.com/api/script"))() end)
-AddButton(TabStealEgg, "Execute Sena Hub", function() loadstring(game:HttpGet("https://senahub.xyz/raw/loader"))() end)
-AddButton(TabStealEgg, "Execute Ww Script", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/virtuososvisualedits-prog/Ww/refs/heads/main/final-obfuscated.lua"))() end)
-AddButton(TabStealEgg, "Execute SabScript Arch", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/sabscrip-arch/srver/refs/heads/main/Stealanegg"))() end)
-AddButton(TabStealEgg, "Execute Lennon Hub V3", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/lennonxscripts/lennonhubv3/refs/heads/main/stealanegg.lua"))() end)
-AddButton(TabStealEgg, "Execute VoidShell Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidShell-null/VoidShell-Hub/refs/heads/main/Scripts/StealAnEgg.luau"))() end)
-AddButton(TabStealEgg, "Execute Chilli Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/Chilli-Hub-Script/refs/heads/main/StealAnEgg"))() end)
-AddButton(TabStealEgg, "Execute Miranda Loader", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/stealaeggs"))() end)
-AddButton(TabStealEgg, "Execute Fn Steal An Egg", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"))() end)
