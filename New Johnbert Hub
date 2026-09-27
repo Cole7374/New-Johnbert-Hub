@@ -51,7 +51,7 @@ ToggleGui.DisplayOrder = 101
 
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(20, 30, 50)
-MainFrame.BackgroundTransparency = 0.25
+MainFrame.BackgroundTransparency = 0.55 -- Gi-dugangan og +30 transparency (0.25 + 0.30)
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 MainFrame.Size = UDim2.new(0, 440, 0, 260)
@@ -60,7 +60,7 @@ MainFrame.ZIndex = 10
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
 local MainStroke = Instance.new("UIStroke", MainFrame)
 MainStroke.Color = Color3.fromRGB(70, 130, 220)
-MainStroke.Transparency = 0.25
+MainStroke.Transparency = 0.55
 MainStroke.Thickness = 2
 
 local draggingMain, dragStartMain, startPosMain
@@ -85,7 +85,7 @@ end)
 
 local ToggleButton = Instance.new("ImageButton", ToggleGui)
 ToggleButton.BackgroundColor3 = Color3.fromRGB(20, 30, 50)
-ToggleButton.BackgroundTransparency = 0.25
+ToggleButton.BackgroundTransparency = 0.55
 ToggleButton.AnchorPoint = Vector2.new(0, 0.5)
 ToggleButton.Position = UDim2.new(0, 10, 0.5, 0)
 ToggleButton.Size = UDim2.new(0, 42, 0, 42)
@@ -96,7 +96,7 @@ ToggleButton.ZIndex = 20
 Instance.new("UICorner", ToggleButton).CornerRadius = UDim.new(0, 8)
 local ToggleStroke = Instance.new("UIStroke", ToggleButton)
 ToggleStroke.Color = Color3.fromRGB(70, 130, 220)
-ToggleStroke.Transparency = 0.25
+ToggleStroke.Transparency = 0.55
 ToggleStroke.Thickness = 2
 
 local draggingToggle, dragStartToggle, startPosToggle
@@ -124,15 +124,15 @@ local function FadeInMain()
     MainFrame.BackgroundTransparency = 1
     MainStroke.Transparency = 1
     local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-    TweenService:Create(MainFrame, tweenInfo, {BackgroundTransparency = 0.25}):Play()
-    TweenService:Create(MainStroke, tweenInfo, {Transparency = 0.25}):Play()
+    TweenService:Create(MainFrame, tweenInfo, {BackgroundTransparency = 0.55}):Play()
+    TweenService:Create(MainStroke, tweenInfo, {Transparency = 0.55}):Play()
 end
 
 local function FadeInToggle()
     ToggleButton.Visible = true
     local tweenInfo = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-    TweenService:Create(ToggleButton, tweenInfo, {BackgroundTransparency = 0.25, ImageTransparency = 0}):Play()
-    TweenService:Create(ToggleStroke, tweenInfo, {Transparency = 0.25}):Play()
+    TweenService:Create(ToggleButton, tweenInfo, {BackgroundTransparency = 0.55, ImageTransparency = 0}):Play()
+    TweenService:Create(ToggleStroke, tweenInfo, {Transparency = 0.55}):Play()
 end
 
 ToggleButton.MouseButton1Click:Connect(function()
@@ -163,7 +163,7 @@ TitleLabel.ZIndex = 11
 
 local CloseButton = Instance.new("TextButton", TopBar)
 CloseButton.BackgroundColor3 = Color3.fromRGB(50, 100, 180)
-CloseButton.BackgroundTransparency = 0.25
+CloseButton.BackgroundTransparency = 0.55
 CloseButton.Position = UDim2.new(1, -26, 0.5, -8)
 CloseButton.Size = UDim2.new(0, 16, 0, 16)
 CloseButton.Font = Enum.Font.GothamBold
@@ -185,7 +185,7 @@ end)
 
 local SearchBox = Instance.new("TextBox", MainFrame)
 SearchBox.BackgroundColor3 = Color3.fromRGB(15, 22, 38)
-SearchBox.BackgroundTransparency = 0.35
+SearchBox.BackgroundTransparency = 0.65
 SearchBox.Position = UDim2.new(0, 124, 0, 32)
 SearchBox.Size = UDim2.new(0, 308, 0, 22)
 SearchBox.Font = Enum.Font.GothamBold
@@ -198,12 +198,12 @@ SearchBox.ZIndex = 11
 Instance.new("UICorner", SearchBox).CornerRadius = UDim.new(0, 4)
 local SearchStroke = Instance.new("UIStroke", SearchBox)
 SearchStroke.Color = Color3.fromRGB(50, 90, 150)
-SearchStroke.Transparency = 0.25
+SearchStroke.Transparency = 0.55
 SearchStroke.Thickness = 1
 
 local Sidebar = Instance.new("ScrollingFrame", MainFrame)
 Sidebar.BackgroundColor3 = Color3.fromRGB(15, 22, 38)
-Sidebar.BackgroundTransparency = 0.35
+Sidebar.BackgroundTransparency = 0.65
 Sidebar.Position = UDim2.new(0, 8, 0, 58)
 Sidebar.Size = UDim2.new(0, 110, 0, 192)
 Sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
@@ -222,7 +222,7 @@ SidebarLayout.Padding = UDim.new(0, 4)
 -- Steady Sidebar Avatar
 local SidebarAvatar = Instance.new("ImageLabel", Sidebar)
 SidebarAvatar.BackgroundColor3 = Color3.fromRGB(30, 45, 70)
-SidebarAvatar.BackgroundTransparency = 0.35
+SidebarAvatar.BackgroundTransparency = 0.65
 SidebarAvatar.Size = UDim2.new(1, 0, 0, 50)
 SidebarAvatar.Image = "rbxthumb://type=AvatarHeadShot&id=8064284458&w=420&h=420"
 SidebarAvatar.ScaleType = Enum.ScaleType.Fit
@@ -242,7 +242,7 @@ local allElements = {}
 local function CreateTab(name)
     local TabBtn = Instance.new("TextButton", Sidebar)
     TabBtn.BackgroundColor3 = Color3.fromRGB(35, 55, 90)
-    TabBtn.BackgroundTransparency = 0.35
+    TabBtn.BackgroundTransparency = 0.65
     TabBtn.Size = UDim2.new(1, 0, 0, 26)
     TabBtn.Font = Enum.Font.GothamBold
     TabBtn.Text = name
@@ -286,7 +286,7 @@ end
 local function AddParagraph(tab, title, desc)
     local f = Instance.new("Frame", tab)
     f.BackgroundColor3 = Color3.fromRGB(30, 45, 70)
-    f.BackgroundTransparency = 0.35
+    f.BackgroundTransparency = 0.65
     f.Size = UDim2.new(1, 0, 0, 36)
     f.ZIndex = 13
     Instance.new("UICorner", f).CornerRadius = UDim.new(0, 5)
@@ -320,7 +320,7 @@ end
 local function AddButton(tab, name, callback)
     local btn = Instance.new("TextButton", tab)
     btn.BackgroundColor3 = Color3.fromRGB(45, 90, 160)
-    btn.BackgroundTransparency = 0.25
+    btn.BackgroundTransparency = 0.55
     btn.Size = UDim2.new(1, 0, 0, 24)
     btn.Font = Enum.Font.GothamBold
     btn.Text = name
@@ -344,11 +344,11 @@ SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
     end
 end)
 
--- Creator Tab (Naa na pud ang Avatar sa sulod)
+-- Creator Tab
 local TabCreator = CreateTab("Creator")
 local CreatorAvatar = Instance.new("ImageLabel", TabCreator)
 CreatorAvatar.BackgroundColor3 = Color3.fromRGB(30, 45, 70)
-CreatorAvatar.BackgroundTransparency = 0.35
+CreatorAvatar.BackgroundTransparency = 0.65
 CreatorAvatar.Size = UDim2.new(1, 0, 0, 80)
 CreatorAvatar.Image = "rbxthumb://type=AvatarHeadShot&id=8064284458&w=420&h=420"
 CreatorAvatar.ScaleType = Enum.ScaleType.Fit
