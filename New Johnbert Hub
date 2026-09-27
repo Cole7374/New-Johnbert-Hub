@@ -219,6 +219,16 @@ SidebarLayout.SortOrder = Enum.SortOrder.LayoutOrder
 SidebarLayout.FillDirection = Enum.FillDirection.Vertical
 SidebarLayout.Padding = UDim.new(0, 4)
 
+-- Steady Sidebar Avatar
+local SidebarAvatar = Instance.new("ImageLabel", Sidebar)
+SidebarAvatar.BackgroundColor3 = Color3.fromRGB(30, 45, 70)
+SidebarAvatar.BackgroundTransparency = 0.35
+SidebarAvatar.Size = UDim2.new(1, 0, 0, 50)
+SidebarAvatar.Image = "rbxthumb://type=AvatarHeadShot&id=8064284458&w=420&h=420"
+SidebarAvatar.ScaleType = Enum.ScaleType.Fit
+SidebarAvatar.ZIndex = 12
+Instance.new("UICorner", SidebarAvatar).CornerRadius = UDim.new(0, 5)
+
 local ContentContainer = Instance.new("Frame", MainFrame)
 ContentContainer.BackgroundTransparency = 1
 ContentContainer.Position = UDim2.new(0, 124, 0, 58)
@@ -334,16 +344,16 @@ SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
     end
 end)
 
--- Creator Tab
+-- Creator Tab (Naa na pud ang Avatar sa sulod)
 local TabCreator = CreateTab("Creator")
-local AvatarImage = Instance.new("ImageLabel", TabCreator)
-AvatarImage.BackgroundColor3 = Color3.fromRGB(30, 45, 70)
-AvatarImage.BackgroundTransparency = 0.35
-AvatarImage.Size = UDim2.new(1, 0, 0, 80)
-AvatarImage.Image = "rbxthumb://type=AvatarHeadShot&id=8064284458&w=420&h=420"
-AvatarImage.ScaleType = Enum.ScaleType.Fit
-AvatarImage.ZIndex = 13
-Instance.new("UICorner", AvatarImage).CornerRadius = UDim.new(0, 5)
+local CreatorAvatar = Instance.new("ImageLabel", TabCreator)
+CreatorAvatar.BackgroundColor3 = Color3.fromRGB(30, 45, 70)
+CreatorAvatar.BackgroundTransparency = 0.35
+CreatorAvatar.Size = UDim2.new(1, 0, 0, 80)
+CreatorAvatar.Image = "rbxthumb://type=AvatarHeadShot&id=8064284458&w=420&h=420"
+CreatorAvatar.ScaleType = Enum.ScaleType.Fit
+CreatorAvatar.ZIndex = 13
+Instance.new("UICorner", CreatorAvatar).CornerRadius = UDim.new(0, 5)
 
 AddParagraph(TabCreator, "Developer Info", "Owner: 09donperds11 (JOHNBERT)")
 AddButton(TabCreator, "Copy Username", function()
@@ -413,6 +423,9 @@ AddButton(TabStealEgg, "Execute Sena Hub", function() loadstring(game:HttpGet("h
 AddButton(TabStealEgg, "Execute VoidShell Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidShell-null/VoidShell-Hub/refs/heads/main/Scripts/StealAnEgg.luau"))() end)
 AddButton(TabStealEgg, "Execute Chilli Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/Chilli-Hub-Script/refs/heads/main/StealAnEgg"))() end)
 AddButton(TabStealEgg, "Execute Fn Steal An Egg", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"))() end)
+AddButton(TabStealEgg, "Execute Sabscrip Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/sabscrip-arch/srver/refs/heads/main/Stealanegg"))() end)
+AddButton(TabStealEgg, "Execute Simple Shader", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/robloxscripts2026/simple-shader/refs/heads/main/lua"))() end)
+AddButton(TabStealEgg, "Execute Pastefy Script", function() loadstring(game:HttpGet("https://pastefy.app/YoZocJ8O/raw"))() end)
 
 task.spawn(function()
     task.wait(3)
