@@ -1,163 +1,420 @@
 -- Owner: 09donperds11 (JOHNBERT)
--- Hub: RENE BATERBONIA HUB - Steal An Egg (Rayfield UI with Hidden Key)
+-- Hub: RENE BATERBONIA HUB - Steal An Egg (Optimized)
 
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-
-local Window = Rayfield:CreateWindow({
-   Name = "RENE BATERBONIA HUB | JOHNBERT",
-   LoadingTitle = "Rene Baterbonia Hub",
-   LoadingSubtitle = "by 09donperds11",
-   ConfigurationSaving = {
-      Enabled = false,
-      FolderName = nil,
-      FileName = "ReneBaterboniaHub"
-   },
-   Discord = {
-      Enabled = false,
-      Invite = "noinvite",
-      RememberJoins = true
-   },
-   KeySystem = true,
-   KeySettings = {
-      Title = "Key System",
-      Subtitle = "Ibutang ang Key para ma-access ang Hub",
-      Note = "Pangitaa ang key o kuhaa kini gikan sa tag-iya.",
-      FileName = "ReneHubKey",
-      SaveKey = true,
-      GrabKeyFromSite = false,
-      Key = {"Key"} -- Gitago na ang pagka-reveal sa note, pero mao gihapon kini ang husto nga key
-   }
-})
-
--- Background Music
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local UserInputService = game:GetService("UserInputService")
 local Lighting = game:GetService("Lighting")
 local TeleportService = game:GetService("TeleportService")
 local HttpService = game:GetService("HttpService")
+local TweenService = game:GetService("TweenService")
 local Camera = workspace.CurrentCamera
 
 pcall(function()
     for _, v in ipairs(PlayerGui:GetChildren()) do
-        if v.Name == "ReneMusic" then v:Destroy() end
+        if v.Name == "ReneBaterboniaMain" or v.Name == "ReneBaterboniaToggle" or v.Name == "ReneMusic" then
+            v:Destroy()
+        end
     end
 end)
 
-local BgMusic = Instance.new("Sound", PlayerGui)
-BgMusic.Name = "ReneMusic"
-BgMusic.SoundId = "rbxassetid://1849159987"
-BgMusic.Volume = 0.5
-BgMusic.Looped = true
-BgMusic:Play()
+pcall(function()
+    local BgMusic = Instance.new("Sound", PlayerGui)
+    BgMusic.Name = "ReneMusic"
+    BgMusic.SoundId = "rbxassetid://113377354243758"
+    BgMusic.Volume = 0.5
+    BgMusic:Play()
+end)
 
--- Tabs
-local TabCreator = Window:CreateTab("Creator", 4483362458)
-local TabMusic = Window:CreateTab("Music", 4483362458)
-local TabAccounts = Window:CreateTab("Accounts", 4483362458)
-local TabPrivateServer = Window:CreateTab("Private Server", 4483362458)
-local TabSettings = Window:CreateTab("Settings", 4483362458)
-local TabStealEgg = Window:CreateTab("Steal An Egg", 4483362458)
+local function PlayClickSound()
+    pcall(function()
+        local ClickSound = Instance.new("Sound", PlayerGui)
+        ClickSound.SoundId = "rbxassetid://102702078778790"
+        ClickSound.Volume = 1.0
+        ClickSound:Play()
+        game:GetService("Debris"):AddItem(ClickSound, 2)
+    end)
+end
 
--- Creator Tab Content
-TabCreator:CreateSection("Developer Info")
-TabCreator:CreateParagraph({Title = "Owner & Creator", Content = "Official Hub Owner: 09donperds11 (JOHNBERT)"})
-TabCreator:CreateButton({
-   Name = "Copy Username",
-   Callback = function()
-      if setclipboard then setclipboard("09donperds11") end
-   end,
-})
+local ScreenGui = Instance.new("ScreenGui", PlayerGui)
+ScreenGui.Name = "ReneBaterboniaMain"
+ScreenGui.IgnoreGuiInset = true
+ScreenGui.ResetOnSpawn = false
+ScreenGui.DisplayOrder = 100
 
--- Music Tab Content
-TabMusic:CreateSection("Background Music Player")
-TabMusic:CreateButton({
-   Name = "▶ Play Music",
-   Callback = function() if BgMusic then BgMusic:Play() end end,
-})
-TabMusic:CreateButton({
-   Name = "⏸ Pause Music",
-   Callback = function() if BgMusic then BgMusic:Pause() end end,
-})
-TabMusic:CreateButton({
-   Name = "🔊 Volume Up (+0.2)",
-   Callback = function() if BgMusic then BgMusic.Volume = math.clamp(BgMusic.Volume + 0.2, 0, 1) end end,
-})
-TabMusic:CreateButton({
-   Name = "🔉 Volume Down (-0.2)",
-   Callback = function() if BgMusic then BgMusic.Volume = math.clamp(BgMusic.Volume - 0.2, 0, 1) end end,
-})
+local ToggleGui = Instance.new("ScreenGui", PlayerGui)
+ToggleGui.Name = "ReneBaterboniaToggle"
+ToggleGui.IgnoreGuiInset = true
+ToggleGui.ResetOnSpawn = false
+ToggleGui.DisplayOrder = 101
 
--- Accounts Tab Content
-TabAccounts:CreateSection("Social Media Links")
-TabAccounts:CreateButton({
-   Name = "Copy TikTok Page: @valenzonajohnbert",
-   Callback = function() if setclipboard then setclipboard("tiktok.com/@valenzonajohnbert") end end,
-})
-TabAccounts:CreateButton({
-   Name = "Copy Facebook Page Link",
-   Callback = function() if setclipboard then setclipboard("https://www.facebook.com/profile.php?id=61584512375546") end end,
-})
-TabAccounts:CreateButton({
-   Name = "Copy Instagram Page Link",
-   Callback = function() if setclipboard then setclipboard("https://www.instagram.com/valenzonajohnbert22") end end,
-})
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 30, 50)
+MainFrame.BackgroundTransparency = 0.25
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+MainFrame.Size = UDim2.new(0, 440, 0, 260)
+MainFrame.Visible = false
+MainFrame.ZIndex = 10
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
+local MainStroke = Instance.new("UIStroke", MainFrame)
+MainStroke.Color = Color3.fromRGB(70, 130, 220)
+MainStroke.Transparency = 0.25
+MainStroke.Thickness = 2
 
--- Private Server Tab Content
-TabPrivateServer:CreateSection("Server Browser")
-TabPrivateServer:CreateButton({
-   Name = "Join Available Server (Player > 0)",
-   Callback = function()
-      task.spawn(function()
-          pcall(function()
-              local cursor = ""
-              local servers = {}
-              repeat
-                  local url = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100" .. (cursor ~= "" and "&cursor=" .. cursor or "")
-                  local data = HttpService:JSONDecode(game:HttpGet(url))
-                  for _, s in ipairs(data.data) do
-                      if s.playing and s.playing > 0 and s.playing < s.maxPlayers and s.id ~= game.JobId then
-                          table.insert(servers, s.id)
-                      end
-                  end
-                  cursor = data.nextPageCursor
-              until #servers > 0 or not cursor
+local draggingMain, dragStartMain, startPosMain
+MainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        draggingMain = true
+        dragStartMain = input.Position
+        startPosMain = MainFrame.Position
+    end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if draggingMain and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStartMain
+        MainFrame.Position = UDim2.new(startPosMain.X.Scale, startPosMain.X.Offset + delta.X, startPosMain.Y.Scale, startPosMain.Y.Offset + delta.Y)
+    end
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        draggingMain = false
+    end
+end)
 
-              if #servers > 0 then
-                  TeleportService:TeleportToPlaceInstance(game.PlaceId, servers[math.random(1, #servers)], LocalPlayer)
-              end
-          end)
-      end)
-   end,
-})
+local ToggleButton = Instance.new("ImageButton", ToggleGui)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(20, 30, 50)
+ToggleButton.BackgroundTransparency = 0.25
+ToggleButton.AnchorPoint = Vector2.new(0, 0.5)
+ToggleButton.Position = UDim2.new(0, 10, 0.5, 0)
+ToggleButton.Size = UDim2.new(0, 42, 0, 42)
+ToggleButton.Image = "rbxassetid://119095374534787"
+ToggleButton.ImageTransparency = 1
+ToggleButton.Visible = false
+ToggleButton.ZIndex = 20
+Instance.new("UICorner", ToggleButton).CornerRadius = UDim.new(0, 8)
+local ToggleStroke = Instance.new("UIStroke", ToggleButton)
+ToggleStroke.Color = Color3.fromRGB(70, 130, 220)
+ToggleStroke.Transparency = 0.25
+ToggleStroke.Thickness = 2
 
--- Settings Tab Content
-TabSettings:CreateSection("Optimization")
-TabSettings:CreateButton({
-   Name = "Enable Potato Graphics",
-   Callback = function()
-      Camera.FieldOfView = 70
-      Lighting.GlobalShadows = false
-      Lighting.FogEnd = 9e9
-      for _, v in ipairs(workspace:GetDescendants()) do
-          if v:IsA("BasePart") then v.Material = Enum.Material.SmoothPlastic v.Reflectance = 0
-          elseif v:IsA("Decal") or v:IsA("Texture") then v.Transparency = 1 end
-      end
-   end,
-})
+local draggingToggle, dragStartToggle, startPosToggle
+ToggleButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        draggingToggle = true
+        dragStartToggle = input.Position
+        startPosToggle = ToggleButton.Position
+    end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if draggingToggle and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStartToggle
+        ToggleButton.Position = UDim2.new(startPosToggle.X.Scale, startPosToggle.X.Offset + delta.X, startPosToggle.Y.Scale, startPosToggle.Y.Offset + delta.Y)
+    end
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        draggingToggle = false
+    end
+end)
 
--- Steal An Egg Tab Content
-TabStealEgg:CreateSection("Steal An Egg Hubs")
-TabStealEgg:CreateButton({ Name = "Execute LKZ Hub", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LucasggkX/LKZ-Hub/refs/heads/main/Loader.lua"))() end })
-TabStealEgg:CreateButton({ Name = "Execute Bee Hub", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/beehub044/Beehub/refs/heads/main/BEE%20HUB%20IS%20BACK"))() end })
-TabStealEgg:CreateButton({ Name = "Execute ZeroIn Hub", Callback = function() loadstring(game:HttpGet("https://zeroinhub.com/api/script"))() end })
-TabStealEgg:CreateButton({ Name = "Execute Sena Hub", Callback = function() loadstring(game:HttpGet("https://senahub.xyz/raw/loader"))() end })
-TabStealEgg:Button({ Name = "Execute Ww Script", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/virtuososvisualedits-prog/Ww/refs/heads/main/final-obfuscated.lua"))() end })
-TabStealEgg:CreateButton({ Name = "Execute SabScript Arch", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/sabscrip-arch/srver/refs/heads/main/Stealanegg"))() end })
-TabStealEgg:CreateButton({ Name = "Execute Lennon Hub V3", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/lennonxscripts/lennonhubv3/refs/heads/main/stealanegg.lua"))() end })
-TabStealEgg:CreateButton({ Name = "Execute VoidShell Hub", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidShell-null/VoidShell-Hub/refs/heads/main/Scripts/StealAnEgg.luau"))() end })
-TabStealEgg:CreateButton({ Name = "Execute Chilli Hub", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/Chilli-Hub-Script/refs/heads/main/StealAnEgg"))() end })
-TabStealEgg:CreateButton({ Name = "Execute Miranda Loader", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/stealaeggs"))() end })
-TabStealEgg:CreateButton({ Name = "Execute Fn Steal An Egg", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"))() end })
+local function FadeInMain()
+    MainFrame.Visible = true
+    MainFrame.BackgroundTransparency = 1
+    MainStroke.Transparency = 1
+    local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    TweenService:Create(MainFrame, tweenInfo, {BackgroundTransparency = 0.25}):Play()
+    TweenService:Create(MainStroke, tweenInfo, {Transparency = 0.25}):Play()
+end
 
-Rayfield:LoadConfiguration()
+local function FadeInToggle()
+    ToggleButton.Visible = true
+    local tweenInfo = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    TweenService:Create(ToggleButton, tweenInfo, {BackgroundTransparency = 0.25, ImageTransparency = 0}):Play()
+    TweenService:Create(ToggleStroke, tweenInfo, {Transparency = 0.25}):Play()
+end
+
+ToggleButton.MouseButton1Click:Connect(function()
+    PlayClickSound()
+    FadeInMain()
+    local hideTween = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    TweenService:Create(ToggleButton, hideTween, {BackgroundTransparency = 1, ImageTransparency = 1}):Play()
+    TweenService:Create(ToggleStroke, hideTween, {Transparency = 1}):Play()
+    task.wait(0.3)
+    ToggleButton.Visible = false
+end)
+
+local TopBar = Instance.new("Frame", MainFrame)
+TopBar.BackgroundTransparency = 1
+TopBar.Size = UDim2.new(1, 0, 0, 28)
+TopBar.ZIndex = 11
+
+local TitleLabel = Instance.new("TextLabel", TopBar)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Position = UDim2.new(0, 8, 0, 0)
+TitleLabel.Size = UDim2.new(0, 360, 1, 0)
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.Text = "RENE BATERBONIA HUB | JOHNBERT"
+TitleLabel.TextColor3 = Color3.fromRGB(220, 235, 255)
+TitleLabel.TextSize = 10
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+TitleLabel.ZIndex = 11
+
+local CloseButton = Instance.new("TextButton", TopBar)
+CloseButton.BackgroundColor3 = Color3.fromRGB(50, 100, 180)
+CloseButton.BackgroundTransparency = 0.25
+CloseButton.Position = UDim2.new(1, -26, 0.5, -8)
+CloseButton.Size = UDim2.new(0, 16, 0, 16)
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.Text = "-"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 12
+CloseButton.ZIndex = 11
+Instance.new("UICorner", CloseButton).CornerRadius = UDim.new(0, 4)
+
+CloseButton.MouseButton1Click:Connect(function()
+    PlayClickSound()
+    local hideTween = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    TweenService:Create(MainFrame, hideTween, {BackgroundTransparency = 1}):Play()
+    TweenService:Create(MainStroke, hideTween, {Transparency = 1}):Play()
+    task.wait(0.3)
+    MainFrame.Visible = false
+    FadeInToggle()
+end)
+
+local SearchBox = Instance.new("TextBox", MainFrame)
+SearchBox.BackgroundColor3 = Color3.fromRGB(15, 22, 38)
+SearchBox.BackgroundTransparency = 0.35
+SearchBox.Position = UDim2.new(0, 124, 0, 32)
+SearchBox.Size = UDim2.new(0, 308, 0, 22)
+SearchBox.Font = Enum.Font.GothamBold
+SearchBox.PlaceholderText = "Search features..."
+SearchBox.Text = ""
+SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+SearchBox.PlaceholderColor3 = Color3.fromRGB(140, 170, 210)
+SearchBox.TextSize = 9
+SearchBox.ZIndex = 11
+Instance.new("UICorner", SearchBox).CornerRadius = UDim.new(0, 4)
+local SearchStroke = Instance.new("UIStroke", SearchBox)
+SearchStroke.Color = Color3.fromRGB(50, 90, 150)
+SearchStroke.Transparency = 0.25
+SearchStroke.Thickness = 1
+
+local Sidebar = Instance.new("ScrollingFrame", MainFrame)
+Sidebar.BackgroundColor3 = Color3.fromRGB(15, 22, 38)
+Sidebar.BackgroundTransparency = 0.35
+Sidebar.Position = UDim2.new(0, 8, 0, 58)
+Sidebar.Size = UDim2.new(0, 110, 0, 192)
+Sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
+Sidebar.ScrollBarThickness = 3
+Sidebar.ScrollingEnabled = true
+Sidebar.AutomaticCanvasSize = Enum.AutomaticSize.Y
+Sidebar.BorderSizePixel = 0
+Sidebar.ZIndex = 11
+Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 6)
+
+local SidebarLayout = Instance.new("UIListLayout", Sidebar)
+SidebarLayout.SortOrder = Enum.SortOrder.LayoutOrder
+SidebarLayout.FillDirection = Enum.FillDirection.Vertical
+SidebarLayout.Padding = UDim.new(0, 4)
+
+local ContentContainer = Instance.new("Frame", MainFrame)
+ContentContainer.BackgroundTransparency = 1
+ContentContainer.Position = UDim2.new(0, 124, 0, 58)
+ContentContainer.Size = UDim2.new(0, 308, 0, 192)
+ContentContainer.ZIndex = 11
+
+local pages = {}
+local activePage = nil
+local allElements = {}
+
+local function CreateTab(name)
+    local TabBtn = Instance.new("TextButton", Sidebar)
+    TabBtn.BackgroundColor3 = Color3.fromRGB(35, 55, 90)
+    TabBtn.BackgroundTransparency = 0.35
+    TabBtn.Size = UDim2.new(1, 0, 0, 26)
+    TabBtn.Font = Enum.Font.GothamBold
+    TabBtn.Text = name
+    TabBtn.TextColor3 = Color3.fromRGB(220, 235, 255)
+    TabBtn.TextSize = 9
+    TabBtn.ZIndex = 12
+    Instance.new("UICorner", TabBtn).CornerRadius = UDim.new(0, 4)
+
+    local Page = Instance.new("ScrollingFrame", ContentContainer)
+    Page.BackgroundTransparency = 1
+    Page.Size = UDim2.new(1, 0, 1, 0)
+    Page.CanvasSize = UDim2.new(0, 0, 0, 0)
+    Page.ScrollBarThickness = 3
+    Page.ScrollingEnabled = true
+    Page.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    Page.Visible = false
+    Page.BorderSizePixel = 0
+    Page.ZIndex = 12
+
+    local PageLayout = Instance.new("UIListLayout", Page)
+    PageLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    PageLayout.FillDirection = Enum.FillDirection.Vertical
+    PageLayout.Padding = UDim.new(0, 4)
+
+    TabBtn.MouseButton1Click:Connect(function()
+        PlayClickSound()
+        for _, p in pairs(pages) do p.Visible = false end
+        Page.Visible = true
+        activePage = Page
+    end)
+
+    if not activePage then
+        Page.Visible = true
+        activePage = Page
+    end
+
+    table.insert(pages, Page)
+    return Page
+end
+
+local function AddParagraph(tab, title, desc)
+    local f = Instance.new("Frame", tab)
+    f.BackgroundColor3 = Color3.fromRGB(30, 45, 70)
+    f.BackgroundTransparency = 0.35
+    f.Size = UDim2.new(1, 0, 0, 36)
+    f.ZIndex = 13
+    Instance.new("UICorner", f).CornerRadius = UDim.new(0, 5)
+    
+    local t = Instance.new("TextLabel", f)
+    t.BackgroundTransparency = 1
+    t.Position = UDim2.new(0, 8, 0, 2)
+    t.Size = UDim2.new(1, -16, 0, 14)
+    t.Font = Enum.Font.GothamBold
+    t.Text = title
+    t.TextColor3 = Color3.fromRGB(230, 245, 255)
+    t.TextSize = 9
+    t.TextXAlignment = Enum.TextXAlignment.Left
+    t.ZIndex = 13
+
+    local d = Instance.new("TextLabel", f)
+    d.BackgroundTransparency = 1
+    d.Position = UDim2.new(0, 8, 0, 16)
+    d.Size = UDim2.new(1, -16, 0, 16)
+    d.Font = Enum.Font.GothamBold
+    d.Text = desc
+    d.TextColor3 = Color3.fromRGB(160, 195, 235)
+    d.TextSize = 8
+    d.TextXAlignment = Enum.TextXAlignment.Left
+    d.ZIndex = 13
+
+    table.insert(allElements, {Object = f, Text = string.lower(title .. " " .. desc)})
+    return f
+end
+
+local function AddButton(tab, name, callback)
+    local btn = Instance.new("TextButton", tab)
+    btn.BackgroundColor3 = Color3.fromRGB(45, 90, 160)
+    btn.BackgroundTransparency = 0.25
+    btn.Size = UDim2.new(1, 0, 0, 24)
+    btn.Font = Enum.Font.GothamBold
+    btn.Text = name
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 9
+    btn.ZIndex = 13
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 5)
+
+    btn.MouseButton1Click:Connect(function()
+        PlayClickSound()
+        callback()
+    end)
+
+    table.insert(allElements, {Object = btn, Text = string.lower(name)})
+end
+
+SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+    local query = string.lower(SearchBox.Text)
+    for _, item in ipairs(allElements) do
+        item.Object.Visible = (query == "" or string.find(item.Text, query) ~= nil)
+    end
+end)
+
+-- Creator Tab
+local TabCreator = CreateTab("Creator")
+local AvatarImage = Instance.new("ImageLabel", TabCreator)
+AvatarImage.BackgroundColor3 = Color3.fromRGB(30, 45, 70)
+AvatarImage.BackgroundTransparency = 0.35
+AvatarImage.Size = UDim2.new(1, 0, 0, 80)
+AvatarImage.Image = "rbxthumb://type=AvatarHeadShot&id=8064284458&w=420&h=420"
+AvatarImage.ScaleType = Enum.ScaleType.Fit
+AvatarImage.ZIndex = 13
+Instance.new("UICorner", AvatarImage).CornerRadius = UDim.new(0, 5)
+
+AddParagraph(TabCreator, "Developer Info", "Owner: 09donperds11 (JOHNBERT)")
+AddButton(TabCreator, "Copy Username", function()
+    if setclipboard then setclipboard("09donperds11") end
+end)
+
+-- Accounts Tab
+local TabAccounts = CreateTab("Accounts")
+AddParagraph(TabAccounts, "Social Links", "Bisitaha ang akong mga official pages!")
+AddButton(TabAccounts, "Copy TikTok: @valenzonajohnbert", function() if setclipboard then setclipboard("tiktok.com/@valenzonajohnbert") end end)
+AddButton(TabAccounts, "Copy Facebook Link", function() if setclipboard then setclipboard("https://www.facebook.com/profile.php?id=61584512375546") end end)
+AddButton(TabAccounts, "Copy Instagram Link", function() if setclipboard then setclipboard("https://www.instagram.com/valenzonajohnbert22") end end)
+
+-- Private Server Tab
+local TabPrivateServer = CreateTab("Private Server")
+local ServerStatus = AddParagraph(TabPrivateServer, "Server Browser", "Status: Ready...")
+AddButton(TabPrivateServer, "Join Available Server", function()
+    ServerStatus.TextLabel.Text = "Searching server..."
+    task.spawn(function()
+        pcall(function()
+            local cursor = ""
+            local servers = {}
+            repeat
+                local url = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100" .. (cursor ~= "" and "&cursor=" .. cursor or "")
+                local success, response = pcall(function() return game:HttpGet(url) end)
+                if success and response then
+                    local data = HttpService:JSONDecode(response)
+                    if data and data.data then
+                        for _, s in ipairs(data.data) do
+                            if s.playing and s.playing > 0 and s.playing < s.maxPlayers and s.id ~= game.JobId then
+                                table.insert(servers, s.id)
+                            end
+                        end
+                        cursor = data.nextPageCursor
+                    else break end
+                else break end
+            until #servers > 0 or not cursor
+
+            if #servers > 0 then
+                TeleportService:TeleportToPlaceInstance(game.PlaceId, servers[math.random(1, #servers)], LocalPlayer)
+            else
+                ServerStatus.TextLabel.Text = "No valid servers found."
+            end
+        end)
+    end)
+end)
+
+-- Settings Tab
+local TabSettings = CreateTab("Settings")
+AddParagraph(TabSettings, "Graphics Options", "I-optimize ang performance.")
+AddButton(TabSettings, "Enable Potato Graphics", function()
+    Camera.FieldOfView = 70
+    Lighting.GlobalShadows = false
+    Lighting.FogEnd = 9e9
+    for _, v in ipairs(workspace:GetDescendants()) do
+        if v:IsA("BasePart") then v.Material = Enum.Material.SmoothPlastic v.Reflectance = 0
+        elseif v:IsA("Decal") or v:IsA("Texture") then v.Transparency = 1 end
+    end
+end)
+
+-- Steal An Egg Tab
+local TabStealEgg = CreateTab("Steal An Egg")
+AddParagraph(TabStealEgg, "Hubs", "Pilia ang hub nga i-execute.")
+AddButton(TabStealEgg, "Execute LKZ Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LucasggkX/LKZ-Hub/refs/heads/main/Loader.lua"))() end)
+AddButton(TabStealEgg, "Execute ZeroIn Hub", function() loadstring(game:HttpGet("https://zeroinhub.com/api/script"))() end)
+AddButton(TabStealEgg, "Execute Sena Hub", function() loadstring(game:HttpGet("https://senahub.xyz/raw/loader"))() end)
+AddButton(TabStealEgg, "Execute VoidShell Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidShell-null/VoidShell-Hub/refs/heads/main/Scripts/StealAnEgg.luau"))() end)
+AddButton(TabStealEgg, "Execute Chilli Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/Chilli-Hub-Script/refs/heads/main/StealAnEgg"))() end)
+AddButton(TabStealEgg, "Execute Fn Steal An Egg", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"))() end)
+
+task.spawn(function()
+    task.wait(3)
+    FadeInMain()
+end)
