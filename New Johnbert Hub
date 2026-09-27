@@ -1,7 +1,5 @@
---[[\
-    Owner: 09donperds11 (JOHNBERT)
-    Hub: RENE BATERBONIA HUB - Steal An Egg (Creator Avatar Thumbnail Fixed)
-]]--
+-- Owner: 09donperds11 (JOHNBERT)
+-- Hub: RENE BATERBONIA HUB - Steal An Egg (No Emotes Version)
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -86,7 +84,7 @@ end
 
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(10, 20, 38)
-MainFrame.BackgroundTransparency = 0.1
+MainFrame.BackgroundTransparency = 0.25
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 MainFrame.Size = UDim2.new(0, 420, 0, 275)
@@ -97,9 +95,10 @@ MainStroke.Color = Color3.fromRGB(0, 160, 255)
 MainStroke.Thickness = 1.5
 MakeDraggable(MainFrame)
 
+-- Image Icon para sa Toggle Button
 local ToggleButton = Instance.new("ImageButton", ToggleGui)
 ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 30, 55)
-ToggleButton.BackgroundTransparency = 0.2
+ToggleButton.BackgroundTransparency = 0.35
 ToggleButton.Position = UDim2.new(0.02, 0, 0.4, 0)
 ToggleButton.Size = UDim2.new(0, 46, 0, 46)
 ToggleButton.Image = "rbxassetid://108764707174374"
@@ -151,7 +150,7 @@ end)
 
 local CloseButton = Instance.new("TextButton", TopBar)
 CloseButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-CloseButton.BackgroundTransparency = 0.3
+CloseButton.BackgroundTransparency = 0.45
 CloseButton.Position = UDim2.new(1, -26, 0.5, -9)
 CloseButton.Size = UDim2.new(0, 18, 0, 18)
 CloseButton.Font = Enum.Font.GothamBold
@@ -168,7 +167,7 @@ end)
 
 local SearchLabel = Instance.new("TextLabel", MainFrame)
 SearchLabel.BackgroundColor3 = Color3.fromRGB(15, 28, 50)
-SearchLabel.BackgroundTransparency = 0.3
+SearchLabel.BackgroundTransparency = 0.45
 SearchLabel.Position = UDim2.new(0, 116, 0, 30)
 SearchLabel.Size = UDim2.new(0, 298, 0, 22)
 SearchLabel.Font = Enum.Font.GothamBold
@@ -179,10 +178,10 @@ Instance.new("UICorner", SearchLabel).CornerRadius = UDim.new(0, 5)
 
 local Sidebar = Instance.new("ScrollingFrame", MainFrame)
 Sidebar.BackgroundColor3 = Color3.fromRGB(15, 28, 50)
-Sidebar.BackgroundTransparency = 0.4
+Sidebar.BackgroundTransparency = 0.55
 Sidebar.Position = UDim2.new(0, 6, 0, 56)
 Sidebar.Size = UDim2.new(0, 105, 0, 210)
-Sidebar.CanvasSize = UDim2.new(0, 0, 1.8, 0)
+Sidebar.CanvasSize = UDim2.new(0, 0, 2.2, 0)
 Sidebar.ScrollBarThickness = 2
 Sidebar.BorderSizePixel = 0
 Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 6)
@@ -201,7 +200,7 @@ local activeTab = nil
 local function CreateTab(name)
     local TabButton = Instance.new("TextButton", Sidebar)
     TabButton.BackgroundColor3 = Color3.fromRGB(18, 40, 70)
-    TabButton.BackgroundTransparency = 0.5
+    TabButton.BackgroundTransparency = 0.65
     TabButton.Size = UDim2.new(0, 97, 0, 24)
     TabButton.Font = Enum.Font.GothamMedium
     TabButton.Text = name
@@ -242,7 +241,7 @@ end
 local function AddParagraph(tab, title, content)
     local Frame = Instance.new("Frame", tab)
     Frame.BackgroundColor3 = Color3.fromRGB(18, 35, 60)
-    Frame.BackgroundTransparency = 0.3
+    Frame.BackgroundTransparency = 0.45
     Frame.Size = UDim2.new(0, 286, 0, 42)
     Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 5)
 
@@ -272,7 +271,7 @@ end
 local function AddButton(tab, name, callback)
     local Btn = Instance.new("TextButton", tab)
     Btn.BackgroundColor3 = Color3.fromRGB(0, 120, 210)
-    Btn.BackgroundTransparency = 0.2
+    Btn.BackgroundTransparency = 0.35
     Btn.Size = UDim2.new(0, 286, 0, 26)
     Btn.Font = Enum.Font.GothamBold
     Btn.Text = name
@@ -285,13 +284,13 @@ local function AddButton(tab, name, callback)
     end)
 end
 
--- Creator Tab (Para kang JOHNBERT ra nga naay Avatar Thumbnail)
+-- Creator Tab
 local TabCreator = CreateTab("Creator")
 AddParagraph(TabCreator, "Developer Info", "Official Hub Owner & Creator: 09donperds11 (JOHNBERT)")
 
 local Card = Instance.new("Frame", TabCreator)
 Card.BackgroundColor3 = Color3.fromRGB(18, 35, 60)
-Card.BackgroundTransparency = 0.3
+Card.BackgroundTransparency = 0.45
 Card.Size = UDim2.new(0, 286, 0, 55)
 Instance.new("UICorner", Card).CornerRadius = UDim.new(0, 5)
 
@@ -314,7 +313,7 @@ NameLbl.TextXAlignment = Enum.TextXAlignment.Left
 
 local CopyBtn = Instance.new("TextButton", Card)
 CopyBtn.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
-CopyBtn.BackgroundTransparency = 0.2
+CopyBtn.BackgroundTransparency = 0.35
 CopyBtn.Position = UDim2.new(0, 58, 0, 28)
 CopyBtn.Size = UDim2.new(0, 220, 0, 20)
 CopyBtn.Font = Enum.Font.GothamBold
@@ -332,10 +331,11 @@ end)
 
 -- Accounts Tab
 local TabAccounts = CreateTab("Accounts")
-AddParagraph(TabAccounts, "Social Media Links", "Click to copy link to clipboard.")
-AddButton(TabAccounts, "Copy TikTok Account", function() if setclipboard then setclipboard("tiktok.com/@valenzonajohnbert") end end)
-AddButton(TabAccounts, "Copy Facebook Account", function() if setclipboard then setclipboard("https://www.facebook.com/profile.php?id=61584512375546") end end)
-AddButton(TabAccounts, "Copy Instagram Account", function() if setclipboard then setclipboard("https://www.instagram.com/valenzonajohnbert22") end end)
+AddParagraph(TabAccounts, "Social Media Links", "Message or visit me on my official pages!")
+AddButton(TabAccounts, "Copy TikTok Page: @valenzonajohnbert", function() if setclipboard then setclipboard("tiktok.com/@valenzonajohnbert") end end)
+AddButton(TabAccounts, "Copy Facebook Page Link", function() if setclipboard then setclipboard("https://www.facebook.com/profile.php?id=61584512375546") end end)
+AddButton(TabAccounts, "Copy Instagram Page Link", function() if setclipboard then setclipboard("https://www.instagram.com/valenzonajohnbert22") end end)
+AddButton(TabAccounts, "✨ COMING SOON: More Socials", function() end)
 
 -- Private Server Tab
 local TabPrivateServer = CreateTab("Private Server")
@@ -371,7 +371,7 @@ end)
 local TabSettings = CreateTab("Settings")
 local PovContainer = Instance.new("Frame", TabSettings)
 PovContainer.BackgroundColor3 = Color3.fromRGB(18, 35, 60)
-PovContainer.BackgroundTransparency = 0.3
+PovContainer.BackgroundTransparency = 0.45
 PovContainer.Size = UDim2.new(0, 286, 0, 75)
 Instance.new("UICorner", PovContainer).CornerRadius = UDim.new(0, 5)
 
@@ -388,6 +388,7 @@ PovTitle.TextXAlignment = Enum.TextXAlignment.Left
 for i, val in ipairs({70, 85, 100, 110, 120}) do
     local povBtn = Instance.new("TextButton", PovContainer)
     povBtn.BackgroundColor3 = Color3.fromRGB(25, 45, 75)
+    povBtn.BackgroundTransparency = 0.35
     povBtn.Position = UDim2.new(0, 8 + ((i-1) * 54), 0, 28)
     povBtn.Size = UDim2.new(0, 50, 0, 24)
     povBtn.Font = Enum.Font.GothamBold
@@ -419,7 +420,7 @@ local configFile = "ReneBaterboniaHub_Config.json"
 
 local LockButton = Instance.new("TextButton", TabConfig)
 LockButton.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
-LockButton.BackgroundTransparency = 0.2
+LockButton.BackgroundTransparency = 0.35
 LockButton.Size = UDim2.new(0, 286, 0, 26)
 LockButton.Font = Enum.Font.GothamBold
 LockButton.Text = "🔒 UI Status: UNLOCKED (Click to Lock)"
@@ -459,7 +460,7 @@ AddButton(TabConfig, "📂 Load Saved Config", function()
     end)
 end)
 
--- Steal An Egg Tab (Tanan nga Hubs)
+-- Steal An Egg Tab
 local TabStealEgg = CreateTab("Steal An Egg")
 AddParagraph(TabStealEgg, "Steal An Egg Hubs", "Select your preferred hub to execute.")
 AddButton(TabStealEgg, "Execute LKZ Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LucasggkX/LKZ-Hub/refs/heads/main/Loader.lua"))() end)
