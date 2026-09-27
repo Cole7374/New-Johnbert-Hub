@@ -1,41 +1,29 @@
 --[[\
     Owner: 09donperds11 (JOHNBERT)
-    Hub: RENE BATERBONIA HUB - Steal An Egg (Spinning Icon Animation without Text + Music)
+    Hub: RENE BATERBONIA HUB - Steal An Egg (Creator Avatar Thumbnail Fixed)
 ]]--
 
-if not game:IsLoaded() then
-    game.Loaded:Wait()
-end
-
-local CoreGui = game:GetService("CoreGui")
-local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local UserInputService = game:GetService("UserInputService")
 local Lighting = game:GetService("Lighting")
 local TeleportService = game:GetService("TeleportService")
 local HttpService = game:GetService("HttpService")
-local TweenService = game:GetService("TweenService")
 local Camera = workspace.CurrentCamera
 
--- Luwas nga pagkuha sa GUI parent para sa Delta/Executors
-local ProtectedGui = CoreGui
+-- Limpyohi ang lumang Guis ug Tunog
 pcall(function()
-    if gethui then
-        ProtectedGui = gethui()
-    end
-end)
-
--- Limpyohi ang lumang Guis
-pcall(function()
-    for _, v in ipairs(ProtectedGui:GetChildren()) do
-        if v.Name == "ReneLoading" or v.Name == "ReneMain" or v.Name == "ReneToggle" or v.Name == "ReneMusic" or v.Name == "ReneIntroIcon" then
+    for _, v in ipairs(PlayerGui:GetChildren()) do
+        if v.Name == "ReneStealAnEggMain" or v.Name == "ReneStealAnEggToggle" or v.Name == "ReneClickSound" or v.Name == "ReneMusic" then
             v:Destroy()
         end
     end
 end)
 
--- Background Music (Luwas nga pagtugtog sa musika)
+-- Background Intro Music
 pcall(function()
-    local BgMusic = Instance.new("Sound", ProtectedGui)
+    local BgMusic = Instance.new("Sound", PlayerGui)
     BgMusic.Name = "ReneMusic"
     BgMusic.SoundId = "rbxassetid://113377354243758"
     BgMusic.Volume = 0.8
@@ -43,55 +31,39 @@ pcall(function()
     BgMusic:Play()
 end)
 
--- 1. INTRO SPINNING ICON GUI (Naa sa tunga, nagtuyok-tuyok nga walay text)
-local IntroGui = Instance.new("ScreenGui")
-IntroGui.Name = "ReneIntroIcon"
-IntroGui.IgnoreGuiInset = true
-IntroGui.ResetOnSpawn = false
-IntroGui.DisplayOrder = 1000000
-IntroGui.Parent = ProtectedGui
+-- Click Sound Function
+local function PlayClickSound()
+    pcall(function()
+        local ClickSound = Instance.new("Sound", PlayerGui)
+        ClickSound.Name = "ReneClickSound"
+        ClickSound.SoundId = "rbxassetid://102702078778790"
+        ClickSound.Volume = 1.0
+        ClickSound.Looped = false
+        ClickSound:Play()
+        ClickSound.Ended:Connect(function()
+            ClickSound:Destroy()
+        end)
+    end)
+end
 
-local IntroIcon = Instance.new("ImageButton", IntroGui)
-IntroIcon.BackgroundColor3 = Color3.fromRGB(15, 30, 55)
-IntroIcon.BackgroundTransparency = 0.3
-IntroIcon.AnchorPoint = Vector2.new(0.5, 0.5)
-IntroIcon.Position = UDim2.new(0.5, 0, 0.5, 0) -- Nagsugod sa tunga sa screen
-IntroIcon.Size = UDim2.new(0, 60, 0, 60)
-IntroIcon.Image = "rbxassetid://108764707174374"
-Instance.new("UICorner", IntroIcon).CornerRadius = UDim.new(1, 0)
-local IntroStroke = Instance.new("UIStroke", IntroIcon)
-IntroStroke.Color = Color3.fromRGB(0, 180, 255)
-IntroStroke.Thickness = 2
-
--- Tuyok-tuyok effect sa tunga
-local spinning = true
-task.spawn(function()
-    while spinning and IntroIcon.Parent do
-        IntroIcon.Rotation = IntroIcon.Rotation + 5
-        task.wait(0.01)
-    end
-end)
-
--- 2. MAIN HUB GUI & TOGGLE GUI (Naka-disable ug naka-hide sa sugod)
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "ReneMain"
+local ScreenGui = Instance.new("ScreenGui", PlayerGui)
+ScreenGui.Name = "ReneStealAnEggMain"
 ScreenGui.IgnoreGuiInset = true
 ScreenGui.ResetOnSpawn = false
-ScreenGui.DisplayOrder = 999999
-ScreenGui.Enabled = false
-ScreenGui.Parent = ProtectedGui
+ScreenGui.DisplayOrder = 1999999
 
-local ToggleGui = Instance.new("ScreenGui")
-ToggleGui.Name = "ReneToggle"
+local ToggleGui = Instance.new("ScreenGui", PlayerGui)
+ToggleGui.Name = "ReneStealAnEggToggle"
 ToggleGui.IgnoreGuiInset = true
 ToggleGui.ResetOnSpawn = false
-ToggleGui.DisplayOrder = 999999
-ToggleGui.Enabled = false
-ToggleGui.Parent = ProtectedGui
+ToggleGui.DisplayOrder = 1999999
+
+local isUILocked = false
 
 local function MakeDraggable(guiObject)
     local dragging, dragStart, startPos
     guiObject.InputBegan:Connect(function(input)
+        if isUILocked then return end
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
@@ -99,6 +71,7 @@ local function MakeDraggable(guiObject)
         end
     end)
     UserInputService.InputChanged:Connect(function(input)
+        if isUILocked then return end
         if dragging and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
             local delta = input.Position - dragStart
             guiObject.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
@@ -113,11 +86,11 @@ end
 
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(10, 20, 38)
-MainFrame.BackgroundTransparency = 0.2
+MainFrame.BackgroundTransparency = 0.1
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-MainFrame.Size = UDim2.new(0, 420, 0, 250)
-MainFrame.Visible = false
+MainFrame.Size = UDim2.new(0, 420, 0, 275)
+MainFrame.Visible = true
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
 local MainStroke = Instance.new("UIStroke", MainFrame)
 MainStroke.Color = Color3.fromRGB(0, 160, 255)
@@ -126,10 +99,11 @@ MakeDraggable(MainFrame)
 
 local ToggleButton = Instance.new("ImageButton", ToggleGui)
 ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 30, 55)
-ToggleButton.BackgroundTransparency = 0.3
-ToggleButton.Position = UDim2.new(0.02, 0, 0.4, 0) -- Tinuod nga pwesto sa Toggle Button
+ToggleButton.BackgroundTransparency = 0.2
+ToggleButton.Position = UDim2.new(0.02, 0, 0.4, 0)
 ToggleButton.Size = UDim2.new(0, 46, 0, 46)
 ToggleButton.Image = "rbxassetid://108764707174374"
+ToggleButton.Visible = false
 Instance.new("UICorner", ToggleButton).CornerRadius = UDim.new(1, 0)
 local ToggleStroke = Instance.new("UIStroke", ToggleButton)
 ToggleStroke.Color = Color3.fromRGB(0, 180, 255)
@@ -137,28 +111,9 @@ ToggleStroke.Thickness = 2
 MakeDraggable(ToggleButton)
 
 ToggleButton.MouseButton1Click:Connect(function()
-    MainFrame.Visible = not MainFrame.Visible
-end)
-
--- Human sa 3.5 ka segundos, molupad ang icon padulong sa pwesto sa ToggleButton unya mogawas ang Main UI
-task.delay(3.5, function()
-    local targetPos = ToggleButton.Position
-    
-    -- Animate ang icon padulong sa final position
-    TweenService:Create(IntroIcon, TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-        Position = targetPos,
-        Size = UDim2.new(0, 46, 0, 46),
-        Rotation = 0
-    }):Play()
-    
-    task.wait(0.8)
-    spinning = false
-    
-    -- Gubaon ang IntroGui unya i-enable ang actual UI ug ipakita ang Main Hub
-    IntroGui:Destroy()
-    ScreenGui.Enabled = true
-    ToggleGui.Enabled = true
+    PlayClickSound()
     MainFrame.Visible = true
+    ToggleButton.Visible = false
 end)
 
 local TopBar = Instance.new("Frame", MainFrame)
@@ -186,7 +141,7 @@ DateTimeLabel.TextSize = 9
 DateTimeLabel.TextXAlignment = Enum.TextXAlignment.Right
 
 task.spawn(function()
-    while MainFrame.Parent do
+    while MainFrame and MainFrame.Parent do
         pcall(function()
             DateTimeLabel.Text = os.date("%b %d, %Y - %I:%M:%S %p")
         end)
@@ -206,15 +161,28 @@ CloseButton.TextSize = 10
 Instance.new("UICorner", CloseButton).CornerRadius = UDim.new(1, 0)
 
 CloseButton.MouseButton1Click:Connect(function() 
+    PlayClickSound()
     MainFrame.Visible = false 
+    ToggleButton.Visible = true
 end)
+
+local SearchLabel = Instance.new("TextLabel", MainFrame)
+SearchLabel.BackgroundColor3 = Color3.fromRGB(15, 28, 50)
+SearchLabel.BackgroundTransparency = 0.3
+SearchLabel.Position = UDim2.new(0, 116, 0, 30)
+SearchLabel.Size = UDim2.new(0, 298, 0, 22)
+SearchLabel.Font = Enum.Font.GothamBold
+SearchLabel.Text = "🔍 SEARCH - COMING SOON"
+SearchLabel.TextColor3 = Color3.fromRGB(255, 180, 50)
+SearchLabel.TextSize = 9
+Instance.new("UICorner", SearchLabel).CornerRadius = UDim.new(0, 5)
 
 local Sidebar = Instance.new("ScrollingFrame", MainFrame)
 Sidebar.BackgroundColor3 = Color3.fromRGB(15, 28, 50)
 Sidebar.BackgroundTransparency = 0.4
-Sidebar.Position = UDim2.new(0, 6, 0, 30)
-Sidebar.Size = UDim2.new(0, 105, 0, 212)
-Sidebar.CanvasSize = UDim2.new(0, 0, 2.6, 0)
+Sidebar.Position = UDim2.new(0, 6, 0, 56)
+Sidebar.Size = UDim2.new(0, 105, 0, 210)
+Sidebar.CanvasSize = UDim2.new(0, 0, 1.8, 0)
 Sidebar.ScrollBarThickness = 2
 Sidebar.BorderSizePixel = 0
 Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 6)
@@ -224,8 +192,8 @@ SidebarLayout.Padding = UDim.new(0, 3)
 
 local ContentArea = Instance.new("Frame", MainFrame)
 ContentArea.BackgroundTransparency = 1
-ContentArea.Position = UDim2.new(0, 116, 0, 30)
-ContentArea.Size = UDim2.new(0, 298, 0, 212)
+ContentArea.Position = UDim2.new(0, 116, 0, 56)
+ContentArea.Size = UDim2.new(0, 298, 0, 210)
 
 local tabsList = {}
 local activeTab = nil
@@ -242,9 +210,10 @@ local function CreateTab(name)
     Instance.new("UICorner", TabButton).CornerRadius = UDim.new(0, 5)
 
     local TabPage = Instance.new("ScrollingFrame", ContentArea)
+    TabPage.Name = name
     TabPage.BackgroundTransparency = 1
     TabPage.Size = UDim2.new(1, 0, 1, 0)
-    TabPage.CanvasSize = UDim2.new(0, 0, 2.8, 0)
+    TabPage.CanvasSize = UDim2.new(0, 0, 2.5, 0)
     TabPage.ScrollBarThickness = 2
     TabPage.Visible = false
     TabPage.BorderSizePixel = 0
@@ -253,8 +222,12 @@ local function CreateTab(name)
     PageLayout.Padding = UDim.new(0, 5)
 
     TabButton.MouseButton1Click:Connect(function()
-        for _, page in pairs(tabsList) do page.Visible = false end
+        PlayClickSound()
+        for _, page in pairs(tabsList) do 
+            page.Visible = false 
+        end
         TabPage.Visible = true
+        activeTab = TabPage
     end)
 
     if not activeTab then
@@ -306,56 +279,76 @@ local function AddButton(tab, name, callback)
     Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
     Btn.TextSize = 10
     Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 5)
-    Btn.MouseButton1Click:Connect(callback)
+    Btn.MouseButton1Click:Connect(function()
+        PlayClickSound()
+        callback()
+    end)
 end
 
--- 1. Creator Tab
+-- Creator Tab (Para kang JOHNBERT ra nga naay Avatar Thumbnail)
 local TabCreator = CreateTab("Creator")
-local AvatarFrame = Instance.new("Frame", TabCreator)
-AvatarFrame.BackgroundColor3 = Color3.fromRGB(18, 35, 60)
-AvatarFrame.BackgroundTransparency = 0.3
-AvatarFrame.Size = UDim2.new(0, 286, 0, 65)
-Instance.new("UICorner", AvatarFrame).CornerRadius = UDim.new(0, 5)
+AddParagraph(TabCreator, "Developer Info", "Official Hub Owner & Creator: 09donperds11 (JOHNBERT)")
 
-local AvatarImage = Instance.new("ImageLabel", AvatarFrame)
-AvatarImage.BackgroundTransparency = 1
-AvatarImage.Position = UDim2.new(0, 8, 0, 8)
-AvatarImage.Size = UDim2.new(0, 48, 0, 48)
-AvatarImage.Image = "rbxthumb://type=AvatarHeadShot&id=8064284458&w=150&h=150"
-Instance.new("UICorner", AvatarImage).CornerRadius = UDim.new(1, 0)
+local Card = Instance.new("Frame", TabCreator)
+Card.BackgroundColor3 = Color3.fromRGB(18, 35, 60)
+Card.BackgroundTransparency = 0.3
+Card.Size = UDim2.new(0, 286, 0, 55)
+Instance.new("UICorner", Card).CornerRadius = UDim.new(0, 5)
 
-local AvatarText = Instance.new("TextLabel", AvatarFrame)
-AvatarText.BackgroundTransparency = 1
-AvatarText.Position = UDim2.new(0, 64, 0, 12)
-AvatarText.Size = UDim2.new(0, 215, 0, 40)
-AvatarText.Font = Enum.Font.GothamBold
-AvatarText.Text = "Owner: 09donperds11 (Johnbert)\nID: 8064284458"
-AvatarText.TextColor3 = Color3.fromRGB(255, 255, 255)
-AvatarText.TextSize = 10
-AvatarText.TextXAlignment = Enum.TextXAlignment.Left
-AddParagraph(TabCreator, "Developer Info", "Official Hub Owner & Creator.")
+local AvatarImg = Instance.new("ImageLabel", Card)
+AvatarImg.BackgroundTransparency = 1
+AvatarImg.Position = UDim2.new(0, 6, 0, 5)
+AvatarImg.Size = UDim2.new(0, 45, 0, 45)
+AvatarImg.Image = "rbxthumb://type=AvatarHeadShot&id=8064284458&w=150&h=150"
+Instance.new("UICorner", AvatarImg).CornerRadius = UDim.new(1, 0)
 
--- 2. Accounts Tab
+local NameLbl = Instance.new("TextLabel", Card)
+NameLbl.BackgroundTransparency = 1
+NameLbl.Position = UDim2.new(0, 58, 0, 8)
+NameLbl.Size = UDim2.new(0, 220, 0, 18)
+NameLbl.Font = Enum.Font.GothamBold
+NameLbl.Text = "09donperds11 (JOHNBERT)"
+NameLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+NameLbl.TextSize = 10
+NameLbl.TextXAlignment = Enum.TextXAlignment.Left
+
+local CopyBtn = Instance.new("TextButton", Card)
+CopyBtn.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
+CopyBtn.BackgroundTransparency = 0.2
+CopyBtn.Position = UDim2.new(0, 58, 0, 28)
+CopyBtn.Size = UDim2.new(0, 220, 0, 20)
+CopyBtn.Font = Enum.Font.GothamBold
+CopyBtn.Text = "Copy Username"
+CopyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CopyBtn.TextSize = 9
+Instance.new("UICorner", CopyBtn).CornerRadius = UDim.new(0, 4)
+
+CopyBtn.MouseButton1Click:Connect(function()
+    PlayClickSound()
+    if setclipboard then
+        setclipboard("09donperds11")
+    end
+end)
+
+-- Accounts Tab
 local TabAccounts = CreateTab("Accounts")
 AddParagraph(TabAccounts, "Social Media Links", "Click to copy link to clipboard.")
 AddButton(TabAccounts, "Copy TikTok Account", function() if setclipboard then setclipboard("tiktok.com/@valenzonajohnbert") end end)
 AddButton(TabAccounts, "Copy Facebook Account", function() if setclipboard then setclipboard("https://www.facebook.com/profile.php?id=61584512375546") end end)
 AddButton(TabAccounts, "Copy Instagram Account", function() if setclipboard then setclipboard("https://www.instagram.com/valenzonajohnbert22") end end)
 
--- 3. Private Server Tab
+-- Private Server Tab
 local TabPrivateServer = CreateTab("Private Server")
 local ServerStatusDesc = AddParagraph(TabPrivateServer, "Server Browser (UNLOCKED)", "Status: Ready to join available servers...")
-
 AddButton(TabPrivateServer, "Join Available Server (Player > 0)", function()
     ServerStatusDesc.Text = "Searching for a valid server..."
     task.spawn(function()
-        local success, err = pcall(function()
+        pcall(function()
             local cursor = ""
             local servers = {}
             repeat
                 local url = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100" .. (cursor ~= "" and "&cursor=" .. cursor or "")
-                local req = game:HttpGet(url)
-                local data = HttpService:JSONDecode(req)
+                local data = HttpService:JSONDecode(game:HttpGet(url))
                 for _, s in ipairs(data.data) do
                     if s.playing and s.playing > 0 and s.playing < s.maxPlayers and s.id ~= game.JobId then
                         table.insert(servers, s.id)
@@ -366,38 +359,16 @@ AddButton(TabPrivateServer, "Join Available Server (Player > 0)", function()
 
             if #servers > 0 then
                 ServerStatusDesc.Text = "Server found! Teleporting..."
-                local randomServerId = servers[math.random(1, #servers)]
-                TeleportService:TeleportToPlaceInstance(game.PlaceId, randomServerId, Players.LocalPlayer)
+                TeleportService:TeleportToPlaceInstance(game.PlaceId, servers[math.random(1, #servers)], LocalPlayer)
             else
-                ServerStatusDesc.Text = "No valid servers found with > 0 players."
+                ServerStatusDesc.Text = "No valid servers found."
             end
         end)
-        if not success then
-            ServerStatusDesc.Text = "Teleport failed. Try again."
-        end
     end)
 end)
 
--- 4. Settings Tab
+-- Settings Tab
 local TabSettings = CreateTab("Settings")
-local CountdownDesc = AddParagraph(TabSettings, "Steal An Egg Admin Abuse", "Calculating countdown...")
-
-task.spawn(function()
-    while MainFrame.Parent do
-        local t = os.date("*t")
-        local currentSeconds = t.hour * 3600 + t.min * 60 + t.sec
-        local diff = (23 * 3600) - currentSeconds
-        if diff < 0 then diff = diff + 86400 end
-        local hours = math.floor(diff / 3600)
-        local minutes = math.floor((diff % 3600) / 60)
-        local seconds = diff % 60
-        if CountdownDesc and CountdownDesc.Parent then
-            CountdownDesc.Text = string.format("Countdown to 11:00 PM: %02d:%02d:%02d", hours, minutes, seconds)
-        end
-        task.wait(1)
-    end
-end)
-
 local PovContainer = Instance.new("Frame", TabSettings)
 PovContainer.BackgroundColor3 = Color3.fromRGB(18, 35, 60)
 PovContainer.BackgroundTransparency = 0.3
@@ -414,8 +385,7 @@ PovTitle.TextColor3 = Color3.fromRGB(0, 200, 255)
 PovTitle.TextSize = 10
 PovTitle.TextXAlignment = Enum.TextXAlignment.Left
 
-local povValues = {70, 85, 100, 110, 120}
-for i, val in ipairs(povValues) do
+for i, val in ipairs({70, 85, 100, 110, 120}) do
     local povBtn = Instance.new("TextButton", PovContainer)
     povBtn.BackgroundColor3 = Color3.fromRGB(25, 45, 75)
     povBtn.Position = UDim2.new(0, 8 + ((i-1) * 54), 0, 28)
@@ -425,8 +395,8 @@ for i, val in ipairs(povValues) do
     povBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
     povBtn.TextSize = 9
     Instance.new("UICorner", povBtn).CornerRadius = UDim.new(0, 4)
-
     povBtn.MouseButton1Click:Connect(function()
+        PlayClickSound()
         Camera.FieldOfView = val
         PovTitle.Text = "📷 Field of View (POV) Changer: " .. tostring(val)
     end)
@@ -442,30 +412,56 @@ AddButton(TabSettings, "Enable Potato Graphics", function()
     end
 end)
 
--- 5. Config Tabs
-local TabConfigTabs = CreateTab("Config Tabs")
-AddParagraph(TabConfigTabs, "Configuration Manager", "Manage and save your hub configurations here.")
-AddButton(TabConfigTabs, "Save Current Settings", function()
-    if setclipboard then setclipboard("Config saved successfully!") end
-end)
-AddButton(TabConfigTabs, "Load Saved Config", function()
-    if setclipboard then setclipboard("Config loaded successfully!") end
+-- Config Tab
+local TabConfig = CreateTab("Config")
+local ConfigDesc = AddParagraph(TabConfig, "Configuration Manager", "Save or Load your preferred UI settings.")
+local configFile = "ReneBaterboniaHub_Config.json"
+
+local LockButton = Instance.new("TextButton", TabConfig)
+LockButton.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+LockButton.BackgroundTransparency = 0.2
+LockButton.Size = UDim2.new(0, 286, 0, 26)
+LockButton.Font = Enum.Font.GothamBold
+LockButton.Text = "🔒 UI Status: UNLOCKED (Click to Lock)"
+LockButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+LockButton.TextSize = 10
+Instance.new("UICorner", LockButton).CornerRadius = UDim.new(0, 5)
+
+LockButton.MouseButton1Click:Connect(function()
+    PlayClickSound()
+    isUILocked = not isUILocked
+    if isUILocked then
+        LockButton.BackgroundColor3 = Color3.fromRGB(50, 180, 50)
+        LockButton.Text = "🔒 UI Status: LOCKED (Click to Unlock)"
+    else
+        LockButton.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+        LockButton.Text = "🔓 UI Status: UNLOCKED (Click to Lock)"
+    end
 end)
 
--- 6. Config Features
-local TabConfigFeatures = CreateTab("Config Features")
-AddParagraph(TabConfigFeatures, "Advanced Features Setup", "Toggle and customize script execution features.")
-AddButton(TabConfigFeatures, "Auto-Execute Features: ON", function()
-    if setclipboard then setclipboard("Auto-Execute toggled.") end
-end)
-AddButton(TabConfigFeatures, "Bypass Anti-Cheat Check", function()
-    if setclipboard then setclipboard("Bypass protocol initialized.") end
+AddButton(TabConfig, "💾 Save Current Config", function()
+    pcall(function()
+        if writefile then
+            writefile(configFile, HttpService:JSONEncode({FOV = Camera.FieldOfView, Locked = isUILocked}))
+            ConfigDesc.Text = "Status: Config successfully saved!"
+        end
+    end)
 end)
 
--- 7. Steal An Egg Tab
+AddButton(TabConfig, "📂 Load Saved Config", function()
+    pcall(function()
+        if readfile and isfile and isfile(configFile) then
+            local data = HttpService:JSONDecode(readfile(configFile))
+            if data.FOV then Camera.FieldOfView = data.FOV PovTitle.Text = "📷 Field of View (POV) Changer: " .. tostring(data.FOV) end
+            if data.Locked ~= nil then isUILocked = data.Locked end
+            ConfigDesc.Text = "Status: Config successfully loaded!"
+        end
+    end)
+end)
+
+-- Steal An Egg Tab (Tanan nga Hubs)
 local TabStealEgg = CreateTab("Steal An Egg")
 AddParagraph(TabStealEgg, "Steal An Egg Hubs", "Select your preferred hub to execute.")
-
 AddButton(TabStealEgg, "Execute LKZ Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LucasggkX/LKZ-Hub/refs/heads/main/Loader.lua"))() end)
 AddButton(TabStealEgg, "Execute Bee Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/beehub044/Beehub/refs/heads/main/BEE%20HUB%20IS%20BACK"))() end)
 AddButton(TabStealEgg, "Execute ZeroIn Hub", function() loadstring(game:HttpGet("https://zeroinhub.com/api/script"))() end)
