@@ -1,7 +1,11 @@
 --[[\
     Owner: 09donperds11 (JOHNBERT)
-    Hub: RENE BATERBONIA HUB - Steal An Egg (Unlocked Private/Public Server Joiner)
+    Hub: RENE BATERBONIA HUB - Steal An Egg (Spinning Icon Animation without Text + Music)
 ]]--
+
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
 
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
@@ -9,15 +13,27 @@ local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
 local TeleportService = game:GetService("TeleportService")
 local HttpService = game:GetService("HttpService")
+local TweenService = game:GetService("TweenService")
 local Camera = workspace.CurrentCamera
-local ProtectedGui = (gethui and gethui()) or CoreGui
 
+-- Luwas nga pagkuha sa GUI parent para sa Delta/Executors
+local ProtectedGui = CoreGui
 pcall(function()
-    if ProtectedGui:FindFirstChild("ReneMain") then ProtectedGui.ReneMain:Destroy() end
-    if ProtectedGui:FindFirstChild("ReneToggle") then ProtectedGui.ReneToggle:Destroy() end
-    if ProtectedGui:FindFirstChild("ReneMusic") then ProtectedGui.ReneMusic:Destroy() end
+    if gethui then
+        ProtectedGui = gethui()
+    end
 end)
 
+-- Limpyohi ang lumang Guis
+pcall(function()
+    for _, v in ipairs(ProtectedGui:GetChildren()) do
+        if v.Name == "ReneLoading" or v.Name == "ReneMain" or v.Name == "ReneToggle" or v.Name == "ReneMusic" or v.Name == "ReneIntroIcon" then
+            v:Destroy()
+        end
+    end
+end)
+
+-- Background Music (Luwas nga pagtugtog sa musika)
 pcall(function()
     local BgMusic = Instance.new("Sound", ProtectedGui)
     BgMusic.Name = "ReneMusic"
@@ -27,19 +43,51 @@ pcall(function()
     BgMusic:Play()
 end)
 
-local ScreenGui = Instance.new("ScreenGui", ProtectedGui)
+-- 1. INTRO SPINNING ICON GUI (Naa sa tunga, nagtuyok-tuyok nga walay text)
+local IntroGui = Instance.new("ScreenGui")
+IntroGui.Name = "ReneIntroIcon"
+IntroGui.IgnoreGuiInset = true
+IntroGui.ResetOnSpawn = false
+IntroGui.DisplayOrder = 1000000
+IntroGui.Parent = ProtectedGui
+
+local IntroIcon = Instance.new("ImageButton", IntroGui)
+IntroIcon.BackgroundColor3 = Color3.fromRGB(15, 30, 55)
+IntroIcon.BackgroundTransparency = 0.3
+IntroIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+IntroIcon.Position = UDim2.new(0.5, 0, 0.5, 0) -- Nagsugod sa tunga sa screen
+IntroIcon.Size = UDim2.new(0, 60, 0, 60)
+IntroIcon.Image = "rbxassetid://108764707174374"
+Instance.new("UICorner", IntroIcon).CornerRadius = UDim.new(1, 0)
+local IntroStroke = Instance.new("UIStroke", IntroIcon)
+IntroStroke.Color = Color3.fromRGB(0, 180, 255)
+IntroStroke.Thickness = 2
+
+-- Tuyok-tuyok effect sa tunga
+local spinning = true
+task.spawn(function()
+    while spinning and IntroIcon.Parent do
+        IntroIcon.Rotation = IntroIcon.Rotation + 5
+        task.wait(0.01)
+    end
+end)
+
+-- 2. MAIN HUB GUI & TOGGLE GUI (Naka-disable ug naka-hide sa sugod)
+local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "ReneMain"
 ScreenGui.IgnoreGuiInset = true
 ScreenGui.ResetOnSpawn = false
 ScreenGui.DisplayOrder = 999999
-ScreenGui.Enabled = true
+ScreenGui.Enabled = false
+ScreenGui.Parent = ProtectedGui
 
-local ToggleGui = Instance.new("ScreenGui", ProtectedGui)
+local ToggleGui = Instance.new("ScreenGui")
 ToggleGui.Name = "ReneToggle"
 ToggleGui.IgnoreGuiInset = true
 ToggleGui.ResetOnSpawn = false
 ToggleGui.DisplayOrder = 999999
-ToggleGui.Enabled = true
+ToggleGui.Enabled = false
+ToggleGui.Parent = ProtectedGui
 
 local function MakeDraggable(guiObject)
     local dragging, dragStart, startPos
@@ -69,7 +117,7 @@ MainFrame.BackgroundTransparency = 0.2
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 MainFrame.Size = UDim2.new(0, 420, 0, 250)
-MainFrame.Visible = true 
+MainFrame.Visible = false
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
 local MainStroke = Instance.new("UIStroke", MainFrame)
 MainStroke.Color = Color3.fromRGB(0, 160, 255)
@@ -79,7 +127,7 @@ MakeDraggable(MainFrame)
 local ToggleButton = Instance.new("ImageButton", ToggleGui)
 ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 30, 55)
 ToggleButton.BackgroundTransparency = 0.3
-ToggleButton.Position = UDim2.new(0.02, 0, 0.4, 0)
+ToggleButton.Position = UDim2.new(0.02, 0, 0.4, 0) -- Tinuod nga pwesto sa Toggle Button
 ToggleButton.Size = UDim2.new(0, 46, 0, 46)
 ToggleButton.Image = "rbxassetid://108764707174374"
 Instance.new("UICorner", ToggleButton).CornerRadius = UDim.new(1, 0)
@@ -87,12 +135,30 @@ local ToggleStroke = Instance.new("UIStroke", ToggleButton)
 ToggleStroke.Color = Color3.fromRGB(0, 180, 255)
 ToggleStroke.Thickness = 2
 MakeDraggable(ToggleButton)
-ToggleButton.Visible = true
 
 ToggleButton.MouseButton1Click:Connect(function()
-    local newState = not MainFrame.Visible
-    MainFrame.Visible = newState
-    ToggleButton.Visible = true
+    MainFrame.Visible = not MainFrame.Visible
+end)
+
+-- Human sa 3.5 ka segundos, molupad ang icon padulong sa pwesto sa ToggleButton unya mogawas ang Main UI
+task.delay(3.5, function()
+    local targetPos = ToggleButton.Position
+    
+    -- Animate ang icon padulong sa final position
+    TweenService:Create(IntroIcon, TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+        Position = targetPos,
+        Size = UDim2.new(0, 46, 0, 46),
+        Rotation = 0
+    }):Play()
+    
+    task.wait(0.8)
+    spinning = false
+    
+    -- Gubaon ang IntroGui unya i-enable ang actual UI ug ipakita ang Main Hub
+    IntroGui:Destroy()
+    ScreenGui.Enabled = true
+    ToggleGui.Enabled = true
+    MainFrame.Visible = true
 end)
 
 local TopBar = Instance.new("Frame", MainFrame)
@@ -141,7 +207,6 @@ Instance.new("UICorner", CloseButton).CornerRadius = UDim.new(1, 0)
 
 CloseButton.MouseButton1Click:Connect(function() 
     MainFrame.Visible = false 
-    ToggleButton.Visible = true 
 end)
 
 local Sidebar = Instance.new("ScrollingFrame", MainFrame)
@@ -277,7 +342,7 @@ AddButton(TabAccounts, "Copy TikTok Account", function() if setclipboard then se
 AddButton(TabAccounts, "Copy Facebook Account", function() if setclipboard then setclipboard("https://www.facebook.com/profile.php?id=61584512375546") end end)
 AddButton(TabAccounts, "Copy Instagram Account", function() if setclipboard then setclipboard("https://www.instagram.com/valenzonajohnbert22") end end)
 
--- 3. Private Server Tab (UNLOCKED & FUNCTIONAL)
+-- 3. Private Server Tab
 local TabPrivateServer = CreateTab("Private Server")
 local ServerStatusDesc = AddParagraph(TabPrivateServer, "Server Browser (UNLOCKED)", "Status: Ready to join available servers...")
 
@@ -287,13 +352,11 @@ AddButton(TabPrivateServer, "Join Available Server (Player > 0)", function()
         local success, err = pcall(function()
             local cursor = ""
             local servers = {}
-            -- Pagkuha sa listahan sa mga active servers sa Roblox API
             repeat
                 local url = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100" .. (cursor ~= "" and "&cursor=" .. cursor or "")
                 local req = game:HttpGet(url)
                 local data = HttpService:JSONDecode(req)
                 for _, s in ipairs(data.data) do
-                    -- Sigurohon nga ang playing > 0 ug dili ang kasamtangang server
                     if s.playing and s.playing > 0 and s.playing < s.maxPlayers and s.id ~= game.JobId then
                         table.insert(servers, s.id)
                     end
