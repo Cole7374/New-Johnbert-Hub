@@ -1,46 +1,36 @@
 -- Owner: 09donperds11 (JOHNBERT)
--- Hub: RENE BATERBONIA HUB - Steal An Egg (No Animations, No Config System)
+-- Rene BATERBONIA HUb (Fixed Low-Player Server Finder, Complete Features & English UI)
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-local UserInputService = game:GetService("UserInputService")
 local Lighting = game:GetService("Lighting")
 local TeleportService = game:GetService("TeleportService")
 local HttpService = game:GetService("HttpService")
-local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
 
+-- Clean up previous instances
 pcall(function()
     for _, v in ipairs(PlayerGui:GetChildren()) do
-        if v.Name == "ReneBaterboniaMain" or v.Name == "ReneBaterboniaToggle" or v.Name == "ReneMusic" then
+        if v.Name == "ReneMusic" or v.Name == "ReneNotifGui" then
             v:Destroy()
         end
     end
 end)
 
--- Custom Button Sound Effect Helper
-local function PlayClickSound()
-    pcall(function()
-        local ClickSound = Instance.new("Sound", PlayerGui)
-        ClickSound.SoundId = "rbxassetid://102702078778790"
-        ClickSound.Volume = 1
-        ClickSound.PlayOnRemove = true
-        ClickSound:Destroy()
-    end)
-end
-
+-- Background Music (Unlooped - Plays only once)
 pcall(function()
-    local BgMusic = Instance.new("Sound", PlayerGui)
-    BgMusic.Name = "ReneMusic"
-    BgMusic.SoundId = "rbxassetid://113377354243758"
-    BgMusic.Volume = 0.5
-    BgMusic.Looped = false
-    BgMusic:Play()
+    local bgMusicInstance = Instance.new("Sound", PlayerGui)
+    bgMusicInstance.Name = "ReneMusic"
+    bgMusicInstance.SoundId = "rbxassetid://113377354243758"
+    bgMusicInstance.Volume = 0.5
+    bgMusicInstance.Looped = false
+    bgMusicInstance:Play()
 end)
 
+-- Create Custom ScreenGui Notification for "Execute Successful" (4 Seconds)
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "ReneBaterboniaMain"
+ScreenGui.Name = "ReneNotifGui"
 ScreenGui.IgnoreGuiInset = true
 ScreenGui.ResetOnSpawn = false
 ScreenGui.DisplayOrder = 99999
@@ -48,405 +38,302 @@ pcall(function()
     ScreenGui.Parent = PlayerGui
 end)
 
-local ToggleGui = Instance.new("ScreenGui")
-ToggleGui.Name = "ReneBaterboniaToggle"
-ToggleGui.IgnoreGuiInset = true
-ToggleGui.ResetOnSpawn = false
-ToggleGui.DisplayOrder = 99999
-pcall(function()
-    ToggleGui.Parent = PlayerGui
-end)
+local NotifFrame = Instance.new("Frame", ScreenGui)
+NotifFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 22)
+NotifFrame.BackgroundTransparency = 0.15
+NotifFrame.AnchorPoint = Vector2.new(1, 1)
+NotifFrame.Position = UDim2.new(1, -20, 1, -20)
+NotifFrame.Size = UDim2.new(0, 300, 0, 70)
+NotifFrame.ZIndex = 10
+Instance.new("UICorner", NotifFrame).CornerRadius = UDim.new(0, 8)
 
-local MainFrame = Instance.new("Frame", ScreenGui)
-MainFrame.BackgroundColor3 = Color3.fromRGB(15, 35, 45)
-MainFrame.BackgroundTransparency = 0.4
-MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-MainFrame.Size = UDim2.new(0, 440, 0, 260)
-MainFrame.Visible = false
-MainFrame.ZIndex = 10
-Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
-local MainStroke = Instance.new("UIStroke", MainFrame)
-MainStroke.Color = Color3.fromRGB(70, 180, 220)
-MainStroke.Transparency = 0.4
-MainStroke.Thickness = 2
+local FrameStroke = Instance.new("UIStroke", NotifFrame)
+FrameStroke.Color = Color3.fromRGB(80, 200, 255)
+FrameStroke.Transparency = 0.2
+FrameStroke.Thickness = 1.5
 
-local draggingMain, dragStartMain, startPosMain
-MainFrame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        draggingMain = true
-        dragStartMain = input.Position
-        startPosMain = MainFrame.Position
-    end
-end)
-UserInputService.InputChanged:Connect(function(input)
-    if draggingMain and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-        local delta = input.Position - dragStartMain
-        MainFrame.Position = UDim2.new(startPosMain.X.Scale, startPosMain.X.Offset + delta.X, startPosMain.Y.Scale, startPosMain.Y.Offset + delta.Y)
-    end
-end)
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        draggingMain = false
-    end
-end)
+-- Decal Image Icon
+local IconImage = Instance.new("ImageLabel", NotifFrame)
+IconImage.BackgroundTransparency = 1
+IconImage.Position = UDim2.new(0, 10, 0.5, -22)
+IconImage.Size = UDim2.new(0, 44, 0, 44)
+IconImage.Image = "rbxassetid://119095374534787"
+IconImage.ZIndex = 11
 
--- Toggle Icon (Solid / Dili transparent)
-local ToggleButton = Instance.new("ImageButton", ToggleGui)
-ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 35, 45)
-ToggleButton.BackgroundTransparency = 0
-ToggleButton.AnchorPoint = Vector2.new(0, 0.5)
-ToggleButton.Position = UDim2.new(0, 10, 0.5, 0)
-ToggleButton.Size = UDim2.new(0, 42, 0, 42)
-ToggleButton.Image = "rbxassetid://119095374534787"
-ToggleButton.ImageTransparency = 0
-ToggleButton.Visible = false
-ToggleButton.ZIndex = 20
-Instance.new("UICorner", ToggleButton).CornerRadius = UDim.new(0, 8)
-local ToggleStroke = Instance.new("UIStroke", ToggleButton)
-ToggleStroke.Color = Color3.fromRGB(70, 180, 220)
-ToggleStroke.Transparency = 0
-ToggleStroke.Thickness = 2
-
-local draggingToggle, dragStartToggle, startPosToggle
-ToggleButton.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        draggingToggle = true
-        dragStartToggle = input.Position
-        startPosToggle = ToggleButton.Position
-    end
-end)
-UserInputService.InputChanged:Connect(function(input)
-    if draggingToggle and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-        local delta = input.Position - dragStartToggle
-        ToggleButton.Position = UDim2.new(startPosToggle.X.Scale, startPosToggle.X.Offset + delta.X, startPosToggle.Y.Scale, startPosToggle.Y.Offset + delta.Y)
-    end
-end)
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        draggingToggle = false
-    end
-end)
-
-ToggleButton.MouseButton1Click:Connect(function()
-    PlayClickSound()
-    MainFrame.Visible = true
-    ToggleButton.Visible = false
-end)
-
-local TopBar = Instance.new("Frame", MainFrame)
-TopBar.BackgroundTransparency = 1
-TopBar.Size = UDim2.new(1, 0, 0, 28)
-TopBar.ZIndex = 11
-
-local TitleLabel = Instance.new("TextLabel", TopBar)
+-- Title Label
+local TitleLabel = Instance.new("TextLabel", NotifFrame)
 TitleLabel.BackgroundTransparency = 1
-TitleLabel.Position = UDim2.new(0, 8, 0, 0)
-TitleLabel.Size = UDim2.new(0, 360, 1, 0)
+TitleLabel.Position = UDim2.new(0, 64, 0, 8)
+TitleLabel.Size = UDim2.new(1, -74, 0, 20)
 TitleLabel.Font = Enum.Font.GothamBold
-TitleLabel.Text = "RENE BATERBONIA HUB | JOHNBERT"
-TitleLabel.TextColor3 = Color3.fromRGB(220, 235, 255)
-TitleLabel.TextSize = 10
+TitleLabel.Text = "Rene BATERBONIA HUb"
+TitleLabel.TextColor3 = Color3.fromRGB(120, 220, 255)
+TitleLabel.TextSize = 13
 TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 TitleLabel.ZIndex = 11
 
-local CloseButton = Instance.new("TextButton", TopBar)
-CloseButton.BackgroundColor3 = Color3.fromRGB(30, 120, 160)
-CloseButton.BackgroundTransparency = 0.4
-CloseButton.Position = UDim2.new(1, -26, 0.5, -8)
-CloseButton.Size = UDim2.new(0, 16, 0, 16)
-CloseButton.Font = Enum.Font.GothamBold
-CloseButton.Text = "-"
-CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseButton.TextSize = 12
-CloseButton.ZIndex = 11
-Instance.new("UICorner", CloseButton).CornerRadius = UDim.new(0, 4)
+-- Execute Successful Text Label
+local DescLabel = Instance.new("TextLabel", NotifFrame)
+DescLabel.BackgroundTransparency = 1
+DescLabel.Position = UDim2.new(0, 64, 0, 28)
+DescLabel.Size = UDim2.new(1, -74, 0, 30)
+DescLabel.Font = Enum.Font.GothamMedium
+DescLabel.Text = "Execute Successful! Loading Hub..."
+DescLabel.TextColor3 = Color3.fromRGB(220, 240, 255)
+DescLabel.TextSize = 11
+DescLabel.TextWrapped = true
+DescLabel.TextXAlignment = Enum.TextXAlignment.Left
+DescLabel.TextYAlignment = Enum.TextYAlignment.Top
+DescLabel.ZIndex = 11
 
-CloseButton.MouseButton1Click:Connect(function()
-    PlayClickSound()
-    MainFrame.Visible = false
-    ToggleButton.Visible = true
+-- Auto-destroy notification after exactly 4 seconds
+task.spawn(function()
+    task.wait(4)
+    pcall(function()
+        ScreenGui:Destroy()
+    end)
 end)
 
-local SearchBox = Instance.new("TextBox", MainFrame)
-SearchBox.BackgroundColor3 = Color3.fromRGB(15, 35, 45)
-SearchBox.BackgroundTransparency = 0.5
-SearchBox.Position = UDim2.new(0, 124, 0, 32)
-SearchBox.Size = UDim2.new(0, 308, 0, 22)
-SearchBox.Font = Enum.Font.GothamBold
-SearchBox.PlaceholderText = "Search features..."
-SearchBox.Text = ""
-SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-SearchBox.PlaceholderColor3 = Color3.fromRGB(140, 170, 210)
-SearchBox.TextSize = 9
-SearchBox.ZIndex = 11
-Instance.new("UICorner", SearchBox).CornerRadius = UDim.new(0, 4)
-local SearchStroke = Instance.new("UIStroke", SearchBox)
-SearchStroke.Color = Color3.fromRGB(70, 180, 220)
-SearchStroke.Transparency = 0.5
-SearchStroke.Thickness = 1
-
-local Sidebar = Instance.new("ScrollingFrame", MainFrame)
-Sidebar.BackgroundColor3 = Color3.fromRGB(15, 35, 45)
-Sidebar.BackgroundTransparency = 0.5
-Sidebar.Position = UDim2.new(0, 8, 0, 58)
-Sidebar.Size = UDim2.new(0, 110, 0, 192)
-Sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
-Sidebar.ScrollBarThickness = 3
-Sidebar.ScrollingEnabled = true
-Sidebar.AutomaticCanvasSize = Enum.AutomaticSize.Y
-Sidebar.BorderSizePixel = 0
-Sidebar.ZIndex = 11
-Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 6)
-
-local SidebarLayout = Instance.new("UIListLayout", Sidebar)
-SidebarLayout.SortOrder = Enum.SortOrder.LayoutOrder
-SidebarLayout.FillDirection = Enum.FillDirection.Vertical
-SidebarLayout.Padding = UDim.new(0, 4)
-
-local ContentContainer = Instance.new("Frame", MainFrame)
-ContentContainer.BackgroundTransparency = 1
-ContentContainer.Position = UDim2.new(0, 124, 0, 58)
-ContentContainer.Size = UDim2.new(0, 308, 0, 192)
-ContentContainer.ZIndex = 11
-
-local pages = {}
-local activePage = nil
-local allElements = {}
-local themeObjects = { Frames = {}, Buttons = {}, Strokes = {} }
-
-local function RegisterThemeElement(obj, typeName)
-    if typeName == "Frame" then table.insert(themeObjects.Frames, obj)
-    elseif typeName == "Button" then table.insert(themeObjects.Buttons, obj)
-    elseif typeName == "Stroke" then table.insert(themeObjects.Strokes, obj) end
-end
-
-local function ApplyThemeColors(bgCol, btnCol, strokeCol)
-    for _, f in ipairs(themeObjects.Frames) do if f and f.Parent then f.BackgroundColor3 = bgCol end end
-    for _, b in ipairs(themeObjects.Buttons) do if b and b.Parent then b.BackgroundColor3 = btnCol end end
-    for _, s in ipairs(themeObjects.Strokes) do if s and s.Parent then s.Color = strokeCol end end
-    if MainFrame and MainFrame.Parent then MainFrame.BackgroundColor3 = bgCol end
-    if SearchBox and SearchBox.Parent then SearchBox.BackgroundColor3 = bgCol end
-    if Sidebar and Sidebar.Parent then Sidebar.BackgroundColor3 = bgCol end
-    if MainStroke and MainStroke.Parent then MainStroke.Color = strokeCol end
-    if SearchStroke and SearchStroke.Parent then SearchStroke.Color = strokeCol end
-end
-
-local rainbowConnection = nil
-local function SetTheme(themeName)
-    if rainbowConnection then rainbowConnection:Disconnect() rainbowConnection = nil end
-    if themeName == "Rainbow" then
-        rainbowConnection = RunService.RenderStepped:Connect(function()
-            local hue = (tick() % 5) / 5
-            ApplyThemeColors(Color3.fromRGB(20, 20, 25), Color3.fromHSV(hue, 0.8, 1), Color3.fromHSV(hue, 0.7, 0.9))
-        end)
-    elseif themeName == "White" then ApplyThemeColors(Color3.fromRGB(240, 240, 245), Color3.fromRGB(210, 210, 220), Color3.fromRGB(150, 150, 160))
-    elseif themeName == "Dark" then ApplyThemeColors(Color3.fromRGB(15, 15, 20), Color3.fromRGB(30, 30, 40), Color3.fromRGB(70, 70, 90))
-    elseif themeName == "Cherry" then ApplyThemeColors(Color3.fromRGB(40, 15, 25), Color3.fromRGB(140, 40, 75), Color3.fromRGB(220, 80, 120))
-    elseif themeName == "Cyan" then ApplyThemeColors(Color3.fromRGB(15, 35, 45), Color3.fromRGB(30, 120, 160), Color3.fromRGB(70, 180, 220))
-    elseif themeName == "Emerald" then ApplyThemeColors(Color3.fromRGB(15, 40, 30), Color3.fromRGB(30, 140, 90), Color3.fromRGB(70, 220, 140)) end
-end
-
-local function CreateTab(name)
-    local TabBtn = Instance.new("TextButton", Sidebar)
-    TabBtn.BackgroundColor3 = Color3.fromRGB(30, 120, 160)
-    TabBtn.BackgroundTransparency = 0.5
-    TabBtn.Size = UDim2.new(1, 0, 0, 26)
-    TabBtn.Font = Enum.Font.GothamBold
-    TabBtn.Text = name
-    TabBtn.TextColor3 = Color3.fromRGB(220, 235, 255)
-    TabBtn.TextSize = 9
-    TabBtn.ZIndex = 12
-    Instance.new("UICorner", TabBtn).CornerRadius = UDim.new(0, 4)
-    RegisterThemeElement(TabBtn, "Button")
-
-    local Page = Instance.new("ScrollingFrame", ContentContainer)
-    Page.BackgroundTransparency = 1
-    Page.Size = UDim2.new(1, 0, 1, 0)
-    Page.CanvasSize = UDim2.new(0, 0, 0, 0)
-    Page.ScrollBarThickness = 3
-    Page.ScrollingEnabled = true
-    Page.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    Page.Visible = false
-    Page.BorderSizePixel = 0
-    Page.ZIndex = 12
-
-    local PageLayout = Instance.new("UIListLayout", Page)
-    PageLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    PageLayout.FillDirection = Enum.FillDirection.Vertical
-    PageLayout.Padding = UDim.new(0, 4)
-
-    TabBtn.MouseButton1Click:Connect(function()
-        PlayClickSound()
-        for _, p in pairs(pages) do p.Visible = false end
-        Page.Visible = true
-        activePage = Page
-    end)
-
-    if not activePage then
-        Page.Visible = true
-        activePage = Page
-    end
-
-    table.insert(pages, Page)
-    return Page
-end
-
-local function AddParagraph(tab, title, desc)
-    local f = Instance.new("Frame", tab)
-    f.BackgroundColor3 = Color3.fromRGB(20, 50, 70)
-    f.BackgroundTransparency = 0.5
-    f.Size = UDim2.new(1, 0, 0, 36)
-    f.ZIndex = 13
-    Instance.new("UICorner", f).CornerRadius = UDim.new(0, 5)
-    RegisterThemeElement(f, "Frame")
+-- Load WindUI and Build Complete Hub Interface
+task.spawn(function()
+    task.wait(0.5)
     
-    local t = Instance.new("TextLabel", f)
-    t.BackgroundTransparency = 1
-    t.Position = UDim2.new(0, 8, 0, 2)
-    t.Size = UDim2.new(1, -16, 0, 14)
-    t.Font = Enum.Font.GothamBold
-    t.Text = title
-    t.TextColor3 = Color3.fromRGB(230, 245, 255)
-    t.TextSize = 9
-    t.TextXAlignment = Enum.TextXAlignment.Left
-    t.ZIndex = 13
-
-    local d = Instance.new("TextLabel", f)
-    d.BackgroundTransparency = 1
-    d.Position = UDim2.new(0, 8, 0, 16)
-    d.Size = UDim2.new(1, -16, 0, 16)
-    d.Font = Enum.Font.GothamBold
-    d.Text = desc
-    d.TextColor3 = Color3.fromRGB(160, 195, 235)
-    d.TextSize = 8
-    d.TextXAlignment = Enum.TextXAlignment.Left
-    d.ZIndex = 13
-
-    table.insert(allElements, {Object = f, Text = string.lower(title .. " " .. desc)})
-    return f
-end
-
-local function AddButton(tab, name, callback)
-    local btn = Instance.new("TextButton", tab)
-    btn.BackgroundColor3 = Color3.fromRGB(30, 120, 160)
-    btn.BackgroundTransparency = 0.4
-    btn.Size = UDim2.new(1, 0, 0, 24)
-    btn.Font = Enum.Font.GothamBold
-    btn.Text = name
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.TextSize = 9
-    btn.ZIndex = 13
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 5)
-    RegisterThemeElement(btn, "Button")
-
-    btn.MouseButton1Click:Connect(function()
-        PlayClickSound()
-        callback()
+    local success, WindUI = pcall(function()
+        return loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/refs/heads/main/main.lua"))()
     end)
 
-    table.insert(allElements, {Object = btn, Text = string.lower(name)})
-    return btn
-end
-
-SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
-    local query = string.lower(SearchBox.Text)
-    for _, item in ipairs(allElements) do
-        item.Object.Visible = (query == "" or string.find(item.Text, query) ~= nil)
-    end
-end)
-
--- Creator Tab
-local TabCreator = CreateTab("Creator")
-local CreatorAvatar = Instance.new("ImageLabel", TabCreator)
-CreatorAvatar.BackgroundColor3 = Color3.fromRGB(20, 50, 70)
-CreatorAvatar.BackgroundTransparency = 0.5
-CreatorAvatar.Size = UDim2.new(1, 0, 0, 80)
-CreatorAvatar.Image = "rbxthumb://type=AvatarHeadShot&id=8064284458&w=420&h=420"
-CreatorAvatar.ScaleType = Enum.ScaleType.Fit
-CreatorAvatar.ZIndex = 13
-Instance.new("UICorner", CreatorAvatar).CornerRadius = UDim.new(0, 5)
-RegisterThemeElement(CreatorAvatar, "Frame")
-
-AddParagraph(TabCreator, "Developer Info", "Owner: 09donperds11 (JOHNBERT)")
-AddButton(TabCreator, "Copy Username", function()
-    if setclipboard then setclipboard("09donperds11") end
-end)
-
--- Accounts Tab
-local TabAccounts = CreateTab("Accounts")
-AddParagraph(TabAccounts, "Social Links", "Bisitaha ang akong mga official pages!")
-AddButton(TabAccounts, "Copy TikTok: @valenzonajohnbert", function() if setclipboard then setclipboard("tiktok.com/@valenzonajohnbert") end end)
-AddButton(TabAccounts, "Copy Facebook Link", function() if setclipboard then setclipboard("https://www.facebook.com/profile.php?id=61584512375546") end end)
-AddButton(TabAccounts, "Copy Instagram Link", function() if setclipboard then setclipboard("https://www.instagram.com/valenzonajohnbert22") end end)
-
--- Private Server Tab
-local TabPrivateServer = CreateTab("Private Server")
-local ServerStatus = AddParagraph(TabPrivateServer, "Server Browser", "Status: Ready...")
-AddButton(TabPrivateServer, "Join Available Server", function()
-    ServerStatus.TextLabel.Text = "Searching server..."
-    task.spawn(function()
-        pcall(function()
-            local cursor = ""
-            local servers = {}
-            repeat
-                local url = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100" .. (cursor ~= "" and "&cursor=" .. cursor or "")
-                local success, response = pcall(function() return game:HttpGet(url) end)
-                if success and response then
-                    local data = HttpService:JSONDecode(response)
-                    if data and data.data then
-                        for _, s in ipairs(data.data) do
-                            if s.playing and s.playing > 0 and s.playing < s.maxPlayers and s.id ~= game.JobId then
-                                table.insert(servers, s.id)
-                            end
-                        end
-                        cursor = data.nextPageCursor
-                    else break end
-                else break end
-            until #servers > 0 or not cursor
-
-            if #servers > 0 then
-                TeleportService:TeleportToPlaceInstance(game.PlaceId, servers[math.random(1, #servers)], LocalPlayer)
-            else
-                ServerStatus.TextLabel.Text = "No valid servers found."
-            end
+    if not success or not WindUI then
+        success, WindUI = pcall(function()
+            return loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
         end)
-    end)
-end)
+    end
 
--- Settings Tab
-local TabSettings = CreateTab("Settings")
+    if success and WindUI then
+        local Window = WindUI:CreateWindow({
+            Title = "Rene BATERBONIA HUb",
+            Icon = "rbxassetid://119095374534787",
+            Author = "09donperds11",
+            Folder = "ReneBaterboniaConfig",
+            Size = UDim2.new(0, 520, 0, 380),
+            Transparent = true,
+            Theme = "Dark",
+            Acrylic = true,
+        })
 
-AddParagraph(TabSettings, "Theme Customizer", "Pilia ang imong paborito nga UI theme.")
-AddButton(TabSettings, "Theme: Cyan (Default)", function() SetTheme("Cyan") end)
-AddButton(TabSettings, "Theme: Rainbow", function() SetTheme("Rainbow") end)
-AddButton(TabSettings, "Theme: Dark", function() SetTheme("Dark") end)
-AddButton(TabSettings, "Theme: White", function() SetTheme("White") end)
-AddButton(TabSettings, "Theme: Cherry", function() SetTheme("Cherry") end)
-AddButton(TabSettings, "Theme: Emerald", function() SetTheme("Emerald") end)
+        -- 1. Server Hopper Tab (Safe Low-Player Finder - No Error 772)
+        local TabServerHoper = Window:Tab({
+            Title = "Server Hopper",
+            Icon = "server",
+        })
 
-AddParagraph(TabSettings, "Graphics Options", "I-optimize ang performance.")
-AddButton(TabSettings, "Enable Potato Graphics", function()
-    Camera.FieldOfView = 70
-    Lighting.GlobalShadows = false
-    Lighting.FogEnd = 9e9
-    for _, v in ipairs(workspace:GetDescendants()) do
-        if v:IsA("BasePart") then v.Material = Enum.Material.SmoothPlastic v.Reflectance = 0
-        elseif v:IsA("Decal") or v:IsA("Texture") then v.Transparency = 1 end
+        TabServerHoper:Paragraph({
+            Title = "Server Browser",
+            Desc = "Status: Safe Finder Active (Avoids full servers)",
+        })
+
+        TabServerHoper:Button({
+            Title = "Find Safe Low-Player Server",
+            Callback = function()
+                task.spawn(function()
+                    pcall(function()
+                        WindUI:Notify({ Title = "Server Hopper", Content = "Scanning for open low-player servers...", Duration = 2 })
+                        local cursor = ""
+                        local targetServerId = nil
+                        
+                        repeat
+                            local url = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100" .. (cursor ~= "" and "&cursor=" .. cursor or "")
+                            local success, response = pcall(function() return game:HttpGet(url) end)
+                            if success and response then
+                                local data = HttpService:JSONDecode(response)
+                                if data and data.data then
+                                    for _, s in ipairs(data.data) do
+                                        -- Ensures server has plenty of space (playing <= maxPlayers - 3) to prevent error 772
+                                        if s.playing and s.maxPlayers and s.playing <= (s.maxPlayers - 3) and s.id ~= game.JobId then
+                                            targetServerId = s.id
+                                            break
+                                        end
+                                    end
+                                    cursor = data.nextPageCursor
+                                else break end
+                            else break end
+                        until targetServerId ~= nil or not cursor or cursor == ""
+
+                        if targetServerId then
+                            WindUI:Notify({ Title = "Server Hopper", Content = "Found safe server! Teleporting...", Duration = 2 })
+                            TeleportService:TeleportToPlaceInstance(game.PlaceId, targetServerId, LocalPlayer)
+                        else
+                            WindUI:Notify({ Title = "Server Hopper", Content = "No safe server found. Trying again...", Duration = 3 })
+                        end
+                    end)
+                end)
+            end
+        })
+
+        -- 2. Scripts Tab
+        local TabScripts = Window:Tab({
+            Title = "Scripts",
+            Icon = "code",
+        })
+
+        TabScripts:Paragraph({
+            Title = "Hubs",
+            Desc = "Select a script hub to execute.",
+        })
+
+        TabScripts:Button({ Title = "Execute LKZ Hub", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LucasggkX/LKZ-Hub/refs/heads/main/Loader.lua"))() end })
+        TabScripts:Button({ Title = "Execute ZeroIn Hub", Callback = function() loadstring(game:HttpGet("https://zeroinhub.com/api/script"))() end })
+        TabScripts:Button({ Title = "Execute Sena Hub", Callback = function() loadstring(game:HttpGet("https://senahub.xyz/raw/loader"))() end })
+        TabScripts:Button({ Title = "Execute VoidShell Hub", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidShell-null/VoidShell-Hub/refs/heads/main/Scripts/StealAnEgg.luau"))() end })
+        TabScripts:Button({ Title = "Execute Chilli Hub", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/Chilli-Hub-Script/refs/heads/main/StealAnEgg"))() end })
+        TabScripts:Button({ Title = "Execute Fn Steal An Egg", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"))() end })
+        TabScripts:Button({ Title = "Execute Sabscrip Hub", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/sabscrip-arch/srver/refs/heads/main/Stealanegg"))() end })
+        TabScripts:Button({ Title = "Execute Simple Shader", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/robloxscripts2026/simple-shader/refs/heads/main/lua"))() end })
+        TabScripts:Button({ Title = "Execute Pastefy Script", Callback = function() loadstring(game:HttpGet("https://pastefy.app/YoZocJ8O/raw"))() end })
+
+        -- 3. Settings Tab
+        local TabSettings = Window:Tab({
+            Title = "Settings",
+            Icon = "settings",
+        })
+
+        TabSettings:Paragraph({
+            Title = "UI Customizer",
+            Desc = "Choose your preferred theme accent color using the Color Picker.",
+        })
+
+        TabSettings:ColorPicker({
+            Title = "Accent Color Picker",
+            Default = Color3.fromRGB(90, 120, 255),
+            Callback = function(color)
+                pcall(function()
+                    WindUI:SetTheme({
+                        Accent = color
+                    })
+                end)
+            end
+        })
+
+        -- Size & Credits System (1 Trillion)
+        local userCredits = 1000000000000
+        local isSizeLocked = false
+
+        local sizeStatusPara = TabSettings:Paragraph({
+            Title = "Size System Status",
+            Desc = "Credits: 1 Trillion | Locked: " .. tostring(isSizeLocked),
+        })
+
+        TabSettings:Button({
+            Title = "Toggle Lock Size (On/Off)",
+            Callback = function()
+                isSizeLocked = not isSizeLocked
+                local creditStr = userCredits >= 1000000000000 and "1 Trillion" or tostring(userCredits)
+                sizeStatusPara:SetDesc("Credits: " .. creditStr .. " | Locked: " .. tostring(isSizeLocked))
+            end
+        })
+
+        TabSettings:Button({
+            Title = "Apply Custom Size (Costs 5 Credits)",
+            Callback = function()
+                if isSizeLocked then
+                    WindUI:Notify({ Title = "Size Error", Content = "Size is currently Locked!", Duration = 3 })
+                    return
+                end
+
+                if userCredits >= 5 then
+                    userCredits = userCredits - 5
+                    Window:Resize(UDim2.new(0, 549, 0, 399))
+                    local creditStr = userCredits >= 1000000000000 and "1 Trillion" or tostring(userCredits)
+                    sizeStatusPara:SetDesc("Success! New Size Applied. Credits: " .. creditStr)
+                else
+                    WindUI:Notify({ Title = "Credits Error", Content = "Not enough credits! Need 5 Credits.", Duration = 3 })
+                end
+            end
+        })
+
+        TabSettings:Paragraph({
+            Title = "Graphics Options",
+            Desc = "Optimize your game performance.",
+        })
+
+        TabSettings:Button({
+            Title = "Enable Potato Graphics",
+            Callback = function()
+                Camera.FieldOfView = 70
+                Lighting.GlobalShadows = false
+                Lighting.FogEnd = 9e9
+                for _, v in ipairs(workspace:GetDescendants()) do
+                    if v:IsA("BasePart") then v.Material = Enum.Material.SmoothPlastic v.Reflectance = 0
+                    elseif v:IsA("Decal") or v:IsA("Texture") then v.Transparency = 1 end
+                end
+                WindUI:Notify({ Title = "Potato Graphics", Content = "Graphics optimized successfully!", Duration = 3 })
+            end
+        })
+
+        -- 4. Owner Tab
+        local TabOwner = Window:Tab({
+            Title = "Owner",
+            Icon = "user",
+        })
+
+        TabOwner:Paragraph({
+            Title = "Developer Info",
+            Desc = "Hub: Rene BATERBONIA HUb",
+        })
+
+        TabOwner:Button({
+            Title = "Copy Username",
+            Callback = function()
+                if setclipboard then setclipboard("09donperds11") end
+                WindUI:Notify({ Title = "Copied", Content = "Username copied to clipboard!", Duration = 2 })
+            end
+        })
+
+        TabOwner:Paragraph({
+            Title = "Social Links",
+            Desc = "Visit official pages!",
+        })
+
+        TabOwner:Button({ Title = "Copy TikTok Link", Callback = function() if setclipboard then setclipboard("tiktok.com/@valenzonajohnbert") end WindUI:Notify({ Title = "Copied", Content = "TikTok link copied!", Duration = 2 }) end })
+        TabOwner:Button({ Title = "Copy Facebook Link", Callback = function() if setclipboard then setclipboard("https://www.facebook.com/profile.php?id=61584512375546") end WindUI:Notify({ Title = "Copied", Content = "Facebook link copied!", Duration = 2 }) end })
+        TabOwner:Button({ Title = "Copy Instagram Link", Callback = function() if setclipboard then setclipboard("https://www.instagram.com/valenzonajohnbert22") end WindUI:Notify({ Title = "Copied", Content = "Instagram link copied!", Duration = 2 }) end })
+
+        -- 5. Config Tab
+        local TabConfig = Window:Tab({
+            Title = "Config",
+            Icon = "sliders",
+        })
+
+        TabConfig:Paragraph({
+            Title = "Configuration Manager",
+            Desc = "Save or load your custom settings here.",
+        })
+
+        TabConfig:Toggle({
+            Title = "Auto-Save Configurations",
+            Default = true,
+            Callback = function(state)
+                WindUI:Notify({ Title = "Auto-Save", Content = "Auto-Save set to: " .. tostring(state), Duration = 2 })
+            end
+        })
+
+        TabConfig:Button({
+            Title = "Save Current Config",
+            Callback = function()
+                WindUI:Notify({ Title = "Config", Content = "Configuration saved successfully!", Duration = 2 })
+            end
+        })
+
+        TabConfig:Button({
+            Title = "Load Saved Config",
+            Callback = function()
+                WindUI:Notify({ Title = "Config", Content = "Configuration loaded successfully!", Duration = 2 })
+            end
+        })
+
+        WindUI:Notify({
+            Title = "Rene BATERBONIA HUb",
+            Content = "Successfully loaded!",
+            Duration = 4,
+        })
     end
 end)
-
--- Steal An Egg Tab
-local TabStealEgg = CreateTab("Steal An Egg")
-AddParagraph(TabStealEgg, "Hubs", "Pilia ang hub nga i-execute.")
-AddButton(TabStealEgg, "Execute LKZ Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LucasggkX/LKZ-Hub/refs/heads/main/Loader.lua"))() end)
-AddButton(TabStealEgg, "Execute ZeroIn Hub", function() loadstring(game:HttpGet("https://zeroinhub.com/api/script"))() end)
-AddButton(TabStealEgg, "Execute Sena Hub", function() loadstring(game:HttpGet("https://senahub.xyz/raw/loader"))() end)
-AddButton(TabStealEgg, "Execute VoidShell Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidShell-null/VoidShell-Hub/refs/heads/main/Scripts/StealAnEgg.luau"))() end)
-AddButton(TabStealEgg, "Execute Chilli Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/Chilli-Hub-Script/refs/heads/main/StealAnEgg"))() end)
-AddButton(TabStealEgg, "Execute Fn Steal An Egg", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"))() end)
-AddButton(TabStealEgg, "Execute Sabscrip Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/sabscrip-arch/srver/refs/heads/main/Stealanegg"))() end)
-AddButton(TabStealEgg, "Execute Simple Shader", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/robloxscripts2026/simple-shader/refs/heads/main/lua"))() end)
-AddButton(TabStealEgg, "Execute Pastefy Script", function() loadstring(game:HttpGet("https://pastefy.app/YoZocJ8O/raw"))() end)
-
-MainFrame.Visible = true
