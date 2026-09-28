@@ -1,328 +1,232 @@
--- Load Luna UI Library (Official GitHub Source)
-local Luna = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nebula-Softworks/Luna-Interface-Suite/refs/heads/main/source.lua", true))()
+--[[
+ .____                  ________ ___.    _____                           __                
+ |    |    __ _______   \_____  \\_ |___/ ____\_ __  ______ ____ _____ _/  |_  ___________ 
+ |    |   |  |  \__  \   /   |   \| __ \   __\  |  \/  ___// ___\\__  \\   __\/  _ \_  __ \
+ |    |___|  |  // __ \_/    |    \ \_\ \  | |  |  /\___ \\  \___ / __ \|  | (  <_> )  | \/
+ |_______ \____/(____  /\_______  /___  /__| |____//____  >\___  >____  /__|  \____/|__|   
+         \/          \/         \/    \/                \/     \/     \/                   
+          \_Welcome to LuaObfuscator.com   (Alpha 0.10.9) ~  Much Love, Ferib 
 
--- Services
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local Workspace = game:GetService("Workspace")
-local Camera = Workspace.CurrentCamera
+]]--
 
--- Create Window
-local Window = Luna:CreateWindow({
-    Name = "JOHNBERT Hub | Ultimate Hub",
-    Subtitle = "Owner & Script Hub",
-    LogoID = "6031097225",
-    LoadingEnabled = true,
-    LoadingTitle = "JOHNBERT Interface Suite",
-    LoadingSubtitle = "Loading Owner, Scripts & Advanced Settings...",
-    ConfigSettings = {
-        RootFolder = nil,
-        ConfigFolder = "JOHNBERTHubConfig"
-    },
-    KeySystem = false,
-})
-
--- ==================== TABS SETUP ====================
-local Tabs = {
-    Owner = Window:CreateTab({
-        Name = "Owner",
-        Icon = "person",
-        ImageSource = "Material",
-        ShowTitle = true,
-    }),
-    Script = Window:CreateTab({
-        Name = "Script",
-        Icon = "code",
-        ImageSource = "Material",
-        ShowTitle = true,
-    }),
-    Settings = Window:CreateTab({
-        Name = "Settings",
-        Icon = "settings",
-        ImageSource = "Material",
-        ShowTitle = true,
-    })
-}
-
--- ==================== 1. OWNER TAB ====================
-Tabs.Owner:CreateSection("Profile Information")
-
-local thumbType = Enum.ThumbnailType.HeadShot
-local thumbSize = Enum.ThumbnailSize.Size420x420
-local content, isReady = Players:GetUserThumbnailAsync(LocalPlayer.UserId, thumbType, thumbSize)
-
-Tabs.Owner:CreateButton({
-    Name = "Username: " .. LocalPlayer.Name,
-    Description = "Display Name: " .. LocalPlayer.DisplayName .. " | ID: " .. tostring(LocalPlayer.UserId),
-    Callback = function()
-        Luna:Notification({
-            Title = "Owner Verified",
-            Content = "Logged in as " .. LocalPlayer.Name,
-            Duration = 3
-        })
-    end,
-})
-
-Tabs.Owner:CreateSection("Avatar Preview ID")
-Tabs.Owner:CreateButton({
-    Name = "Avatar Asset ID / Link",
-    Description = content,
-    Callback = function()
-        setclipboard(content)
-        Luna:Notification({
-            Title = "Copied",
-            Content = "Avatar image URL copied to clipboard!",
-            Duration = 3
-        })
-    end,
-})
-
--- ==================== 2. SCRIPT TAB ====================
-Tabs.Script:CreateSection("Featured Script")
-
-Tabs.Script:CreateButton({
-    Name = "Low Server Finder OP",
-    Description = "Click to execute Low Server Finder OP",
-    Callback = function()
-        local success, err = pcall(function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/billionergangb-art/Low-Server-Finder-/refs/heads/main/Low%20Server%20Finder%20OP"))()
-        end)
-        if success then
-            Luna:Notification({
-                Title = "Success",
-                Content = "Executed: Low Server Finder OP",
-                Duration = 3
-            })
-        else
-            Luna:Notification({
-                Title = "Error",
-                Content = "Failed to execute. Check F9 console.",
-                Duration = 4
-            })
-            warn("Error executing Low Server Finder OP: " .. tostring(err))
-        end
-    end,
-})
-
-Tabs.Script:CreateSection("Loaded External Scripts")
-
-local scriptsList = {
-    {"Solix Hub", "https://solixhub.com/loader"},
-    {"Clover Hub", "https://cloverhub.app/clover.lua"},
-    {"Fn Steal An Egg", "https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"},
-    {"Lennon Hub (Steal an Egg)", "https://raw.githubusercontent.com/lennonxscripts/lennonhub/main/stealaegg.lua"},
-    {"Decode Script", "https://raw.githubusercontent.com/ItzYumi/Decode/refs/heads/main/DE%3ACODE.lua"},
-    {"Ww Obfuscated Script 1", "https://raw.githubusercontent.com/virtuososvisualedits-prog/Ww/refs/heads/main/final-obfuscated.lua"},
-    {"BF Loader", "https://raw.githubusercontent.com/hanniii1/Loader/refs/heads/main/BFLoader.lua"},
-    {"Fyy Community", "https://FyyCommunity.my.id"},
-    {"Speed Hub X", "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
-    {"Lennon Hub V2 (Steal an Egg)", "https://raw.githubusercontent.com/lennonxscripts/lennonhubv2/refs/heads/main/stealaneggv2"},
-    {"Miiranda Hub (Steal an Eggs)", "https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/stealaeggs"},
-    {"Zeroin Hub", "https://zeroinhub.com/api/script"},
-    {"Pastefy Custom Script", "https://pastefy.app/YoZocJ8O/raw"},
-    {"Sabscrip Steal an Egg", "https://raw.githubusercontent.com/sabscrip-arch/srver/refs/heads/main/Stealanegg"},
-    {"LKZ Hub Loader", "https://raw.githubusercontent.com/LucasggkX/LKZ-Hub/refs/heads/main/Loader.lua"},
-    {"Simple Shader", "https://raw.githubusercontent.com/robloxscripts2026/simple-shader/refs/heads/main/lua"},
-    {"Ww Obfuscated Script 2", "https://raw.githubusercontent.com/virtuososvisualedits-prog/Ww/refs/heads/main/final-obfuscated.lua"},
-    {"Sena Hub Loader", "https://senahub.xyz/raw/loader"}
-}
-
+local Luna = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nebula-Softworks/Luna-Interface-Suite/refs/heads/main/source.lua", true))();
+local Players = game:GetService("Players");
+local LocalPlayer = Players.LocalPlayer;
+local Workspace = game:GetService("Workspace");
+local Camera = Workspace.CurrentCamera;
+local Window = Luna:CreateWindow({Name="JOHNBERT Hub | Ultimate Hub",Subtitle="Owner & Script Hub",LogoID="6031097225",LoadingEnabled=true,LoadingTitle="JOHNBERT Interface Suite",LoadingSubtitle="Loading Owner, Scripts & Advanced Settings...",ConfigSettings={RootFolder=nil,ConfigFolder="JOHNBERTHubConfig"},KeySystem=false});
+local Tabs = {Owner=Window:CreateTab({Name="Owner",Icon="person",ImageSource="Material",ShowTitle=true}),Script=Window:CreateTab({Name="Script",Icon="code",ImageSource="Material",ShowTitle=true}),Settings=Window:CreateTab({Name="Settings",Icon="settings",ImageSource="Material",ShowTitle=true})};
+Tabs.Owner:CreateSection("Profile Information");
+local thumbType = Enum.ThumbnailType.HeadShot;
+local thumbSize = Enum.ThumbnailSize.Size420x420;
+local content, isReady = Players:GetUserThumbnailAsync(LocalPlayer.UserId, thumbType, thumbSize);
+Tabs.Owner:CreateButton({Name=("Username: " .. LocalPlayer.Name),Description=("Display Name: " .. LocalPlayer.DisplayName .. " | ID: " .. tostring(LocalPlayer.UserId)),Callback=function()
+	Luna:Notification({Title="Owner Verified",Content=("Logged in as " .. LocalPlayer.Name),Duration=3});
+end});
+Tabs.Owner:CreateSection("Avatar Preview ID");
+Tabs.Owner:CreateButton({Name="Avatar Asset ID / Link",Description=content,Callback=function()
+	local FlatIdent_378D0 = 0;
+	while true do
+		if (FlatIdent_378D0 == 0) then
+			setclipboard(content);
+			Luna:Notification({Title="Copied",Content="Avatar image URL copied to clipboard!",Duration=3});
+			break;
+		end
+	end
+end});
+Tabs.Script:CreateSection("Featured Script");
+Tabs.Script:CreateButton({Name="Low Server Finder OP",Description="Click to execute Low Server Finder OP",Callback=function()
+	local success, err = pcall(function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/billionergangb-art/Low-Server-Finder-/refs/heads/main/Low%20Server%20Finder%20OP"))();
+	end);
+	if success then
+		Luna:Notification({Title="Success",Content="Executed: Low Server Finder OP",Duration=3});
+	else
+		Luna:Notification({Title="Error",Content="Failed to execute. Check F9 console.",Duration=4});
+		warn("Error executing Low Server Finder OP: " .. tostring(err));
+	end
+end});
+Tabs.Script:CreateSection("Loaded External Scripts");
+local scriptsList = {{"Solix Hub","https://solixhub.com/loader"},{"Clover Hub","https://cloverhub.app/clover.lua"},{"Fn Steal An Egg","https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"},{"Lennon Hub (Steal an Egg)","https://raw.githubusercontent.com/lennonxscripts/lennonhub/main/stealaegg.lua"},{"Decode Script","https://raw.githubusercontent.com/ItzYumi/Decode/refs/heads/main/DE%3ACODE.lua"},{"Ww Obfuscated Script 1","https://raw.githubusercontent.com/virtuososvisualedits-prog/Ww/refs/heads/main/final-obfuscated.lua"},{"BF Loader","https://raw.githubusercontent.com/hanniii1/Loader/refs/heads/main/BFLoader.lua"},{"Fyy Community","https://FyyCommunity.my.id"},{"Speed Hub X","https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},{"Lennon Hub V2 (Steal an Egg)","https://raw.githubusercontent.com/lennonxscripts/lennonhubv2/refs/heads/main/stealaneggv2"},{"Miiranda Hub (Steal an Eggs)","https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/stealaeggs"},{"Zeroin Hub","https://zeroinhub.com/api/script"},{"Pastefy Custom Script","https://pastefy.app/YoZocJ8O/raw"},{"Sabscrip Steal an Egg","https://raw.githubusercontent.com/sabscrip-arch/srver/refs/heads/main/Stealanegg"},{"LKZ Hub Loader","https://raw.githubusercontent.com/LucasggkX/LKZ-Hub/refs/heads/main/Loader.lua"},{"Simple Shader","https://raw.githubusercontent.com/robloxscripts2026/simple-shader/refs/heads/main/lua"},{"Ww Obfuscated Script 2","https://raw.githubusercontent.com/virtuososvisualedits-prog/Ww/refs/heads/main/final-obfuscated.lua"},{"Sena Hub Loader","https://senahub.xyz/raw/loader"}};
 for _, item in ipairs(scriptsList) do
-    Tabs.Script:CreateButton({
-        Name = item[1],
-        Description = "Click to execute " .. item[1],
-        Callback = function()
-            local success, err = pcall(function()
-                loadstring(game:HttpGet(item[2]))()
-            end)
-            if success then
-                Luna:Notification({
-                    Title = "Success",
-                    Content = "Executed: " .. item[1],
-                    Duration = 3
-                })
-            else
-                Luna:Notification({
-                    Title = "Error",
-                    Content = "Failed to execute. Check F9 console.",
-                    Duration = 4
-                })
-                warn("Error executing " .. item[1] .. ": " .. tostring(err))
-            end
-        end,
-    })
+	Tabs.Script:CreateButton({Name=item[1],Description=("Click to execute " .. item[1]),Callback=function()
+		local FlatIdent_2953F = 0;
+		local success;
+		local err;
+		while true do
+			if (FlatIdent_2953F == 0) then
+				success, err = pcall(function()
+					loadstring(game:HttpGet(item[2]))();
+				end);
+				if success then
+					Luna:Notification({Title="Success",Content=("Executed: " .. item[1]),Duration=3});
+				else
+					local FlatIdent_2FBEB = 0;
+					while true do
+						if (FlatIdent_2FBEB == 0) then
+							Luna:Notification({Title="Error",Content="Failed to execute. Check F9 console.",Duration=4});
+							warn("Error executing " .. item[1] .. ": " .. tostring(err));
+							break;
+						end
+					end
+				end
+				break;
+			end
+		end
+	end});
 end
-
--- ==================== 3. SETTINGS TAB ====================
-Tabs.Settings:CreateSection("Gameplay Enhancements")
-
-Tabs.Settings:CreateSlider({
-    Name = "WalkSpeed (Up to 1000)",
-    Description = "Adjust your character's walking speed up to 1000.",
-    Range = {16, 1000},
-    Increment = 1,
-    CurrentValue = 16,
-    Callback = function(Value)
-        pcall(function()
-            LocalPlayer.Character.Humanoid.WalkSpeed = Value
-        end)
-    end,
-})
-
-Tabs.Settings:CreateSlider({
-    Name = "POV Changer (Field of View)",
-    Description = "Adjust your camera's field of view.",
-    Range = {70, 120},
-    Increment = 1,
-    CurrentValue = 70,
-    Callback = function(Value)
-        pcall(function()
-            Camera.FieldOfView = Value
-        end)
-    end,
-})
-
-Tabs.Settings:CreateToggle({
-    Name = "Bypass Anti-Cheat",
-    Description = "Attempts to hook or suppress generic checks.",
-    CurrentValue = false,
-    Callback = function(Value)
-        if Value then
-            pcall(function()
-                local mt = getrawmetatable(game)
-                setreadonly(mt, false)
-                local old = mt.__namecall
-                mt.__namecall = newcclosure(function(self, ...)
-                    local method = getnamecallmethod()
-                    if method == "Kick" or method == "kick" then
-                        return nil
-                    end
-                    return old(self, ...)
-                end)
-                setreadonly(mt, true)
-            end)
-            Luna:Notification({
-                Title = "Anti-Cheat",
-                Content = "Bypass hooks applied successfully!",
-                Duration = 3
-            })
-        else
-            Luna:Notification({
-                Title = "Anti-Cheat",
-                Content = "Bypass toggled off.",
-                Duration = 3
-            })
-        end
-    end,
-})
-
-Tabs.Settings:CreateSection("Live Countdowns")
-
-local xmassLabel = Tabs.Settings:CreateButton({
-    Name = "Christmas Countdown: Calculating...",
-    Description = "Time remaining until December 25",
-    Callback = function() end,
-})
-
-local satLabel = Tabs.Settings:CreateButton({
-    Name = "Saturday 11:00 PM: Calculating...",
-    Description = "Time remaining until next Saturday night",
-    Callback = function() end,
-})
-
--- Live Timer Update Loop
+Tabs.Settings:CreateSection("Gameplay Enhancements");
+Tabs.Settings:CreateSlider({Name="WalkSpeed (Up to 1000)",Description="Adjust your character's walking speed up to 1000.",Range={16,1000},Increment=1,CurrentValue=16,Callback=function(Value)
+	pcall(function()
+		LocalPlayer.Character.Humanoid.WalkSpeed = Value;
+	end);
+end});
+Tabs.Settings:CreateSlider({Name="POV Changer (Field of View)",Description="Adjust your camera's field of view.",Range={70,120},Increment=1,CurrentValue=70,Callback=function(Value)
+	pcall(function()
+		Camera.FieldOfView = Value;
+	end);
+end});
+Tabs.Settings:CreateToggle({Name="Bypass Anti-Cheat",Description="Attempts to hook or suppress generic checks.",CurrentValue=false,Callback=function(Value)
+	if Value then
+		local FlatIdent_8D83D = 0;
+		while true do
+			if (FlatIdent_8D83D == 0) then
+				pcall(function()
+					local FlatIdent_1743D = 0;
+					local mt;
+					local old;
+					while true do
+						if (FlatIdent_1743D == 1) then
+							old = mt.__namecall;
+							mt.__namecall = newcclosure(function(self, ...)
+								local FlatIdent_39B0 = 0;
+								local method;
+								while true do
+									if (FlatIdent_39B0 == 0) then
+										method = getnamecallmethod();
+										if ((method == "Kick") or (method == "kick")) then
+											return nil;
+										end
+										FlatIdent_39B0 = 1;
+									end
+									if (FlatIdent_39B0 == 1) then
+										return old(self, ...);
+									end
+								end
+							end);
+							FlatIdent_1743D = 2;
+						end
+						if (2 == FlatIdent_1743D) then
+							setreadonly(mt, true);
+							break;
+						end
+						if (FlatIdent_1743D == 0) then
+							mt = getrawmetatable(game);
+							setreadonly(mt, false);
+							FlatIdent_1743D = 1;
+						end
+					end
+				end);
+				Luna:Notification({Title="Anti-Cheat",Content="Bypass hooks applied successfully!",Duration=3});
+				break;
+			end
+		end
+	else
+		Luna:Notification({Title="Anti-Cheat",Content="Bypass toggled off.",Duration=3});
+	end
+end});
+Tabs.Settings:CreateSection("Live Countdowns");
+local xmassLabel = Tabs.Settings:CreateButton({Name="Christmas Countdown: Calculating...",Description="Time remaining until December 25",Callback=function()
+end});
+local satLabel = Tabs.Settings:CreateButton({Name="Saturday 11:00 PM: Calculating...",Description="Time remaining until next Saturday night",Callback=function()
+end});
 task.spawn(function()
-    while task.wait(1) do
-        pcall(function()
-            -- Christmas Countdown (Dec 25, 2026)
-            local targetXmas = os.time({year=2026, month=12, day=25, hour=0, min=0, sec=0})
-            local diffXmas = targetXmas - os.time()
-            if diffXmas > 0 then
-                local days = math.floor(diffXmas / 86400)
-                local hours = math.floor((diffXmas % 86400) / 3600)
-                local mins = math.floor((diffXmas % 3600) / 60)
-                local secs = diffXmas % 60
-                xmassLabel:SetName(string.format("🎄 Xmas: %dd %dh %dm %ds", days, hours, mins, secs))
-            else
-                xmassLabel:SetName("🎄 Merry Christmas!")
-            end
-
-            -- Saturday 11:00 PM Countdown
-            local currTime = os.time()
-            local dateTable = os.date("*t", currTime)
-            local daysUntilSat = (7 - dateTable.wday) % 7
-            if daysUntilSat == 0 and (dateTable.hour > 23 or (dateTable.hour == 23 and dateTable.min > 0)) then
-                daysUntilSat = 7
-            end
-            local targetSat = os.time({
-                year = dateTable.year,
-                month = dateTable.month,
-                day = dateTable.day + daysUntilSat,
-                hour = 23,
-                min = 0,
-                sec = 0
-            })
-            local diffSat = targetSat - currTime
-            if diffSat > 0 then
-                local d = math.floor(diffSat / 86400)
-                local h = math.floor((diffSat % 86400) / 3600)
-                local m = math.floor((diffSat % 3600) / 60)
-                local s = diffSat % 60
-                satLabel:SetName(string.format("⏰ Sat 11PM: %dd %dh %dm %ds", d, h, m, s))
-            else
-                satLabel:SetName("⏰ Sat 11:00 PM Na!")
-            end
-        end)
-    end
-end)
-
-Tabs.Settings:CreateSection("Configuration Manager")
-
-Tabs.Settings:CreateButton({
-    Name = "Save Config",
-    Description = "Save your current UI settings to file.",
-    Callback = function()
-        Luna:Notification({
-            Title = "Config System",
-            Content = "Configuration saved successfully!",
-            Duration = 3
-        })
-    end,
-})
-
-Tabs.Settings:CreateButton({
-    Name = "Load Config",
-    Description = "Load saved configuration files.",
-    Callback = function()
-        Luna:Notification({
-            Title = "Config System",
-            Content = "Configuration loaded successfully!",
-            Duration = 3
-        })
-    end,
-})
-
-Tabs.Settings:CreateToggle({
-    Name = "Auto Config",
-    Description = "Automatically load configuration on startup.",
-    CurrentValue = false,
-    Callback = function(Value)
-        print("Auto Config State: " .. tostring(Value))
-    end,
-})
-
-Tabs.Settings:CreateSection("UI Control")
-Tabs.Settings:CreateButton({
-    Name = "Unload UI",
-    Description = "Completely removes the script hub.",
-    Callback = function()
-        Luna:Unload()
-    end,
-})
-
--- Initial Notification
-Luna:Notification({
-    Title = "JOHNBERT Hub Loaded!",
-    Content = "Low Server Finder OP successfully added.",
-    Duration = 5
-})
+	while task.wait(1) do
+		pcall(function()
+			local FlatIdent_61585 = 0;
+			local targetXmas;
+			local diffXmas;
+			local currTime;
+			local dateTable;
+			local daysUntilSat;
+			local targetSat;
+			local diffSat;
+			while true do
+				if (1 == FlatIdent_61585) then
+					if (diffXmas > 0) then
+						local FlatIdent_40CF = 0;
+						local days;
+						local hours;
+						local mins;
+						local secs;
+						while true do
+							if (FlatIdent_40CF == 0) then
+								days = math.floor(diffXmas / 86400);
+								hours = math.floor((diffXmas % 86400) / 3600);
+								FlatIdent_40CF = 1;
+							end
+							if (FlatIdent_40CF == 1) then
+								mins = math.floor((diffXmas % 3600) / 60);
+								secs = diffXmas % 60;
+								FlatIdent_40CF = 2;
+							end
+							if (FlatIdent_40CF == 2) then
+								xmassLabel:SetName(string.format("ðŸŽ„ Xmas: %dd %dh %dm %ds", days, hours, mins, secs));
+								break;
+							end
+						end
+					else
+						xmassLabel:SetName("ðŸŽ„ Merry Christmas!");
+					end
+					currTime = os.time();
+					FlatIdent_61585 = 2;
+				end
+				if (FlatIdent_61585 == 2) then
+					dateTable = os.date("*t", currTime);
+					daysUntilSat = (7 - dateTable.wday) % 7;
+					FlatIdent_61585 = 3;
+				end
+				if (FlatIdent_61585 == 3) then
+					if ((daysUntilSat == 0) and ((dateTable.hour > 23) or ((dateTable.hour == 23) and (dateTable.min > 0)))) then
+						daysUntilSat = 7;
+					end
+					targetSat = os.time({year=dateTable.year,month=dateTable.month,day=(dateTable.day + daysUntilSat),hour=23,min=0,sec=0});
+					FlatIdent_61585 = 4;
+				end
+				if (0 == FlatIdent_61585) then
+					targetXmas = os.time({year=2026,month=12,day=25,hour=0,min=0,sec=0});
+					diffXmas = targetXmas - os.time();
+					FlatIdent_61585 = 1;
+				end
+				if (FlatIdent_61585 == 4) then
+					diffSat = targetSat - currTime;
+					if (diffSat > 0) then
+						local d = math.floor(diffSat / 86400);
+						local h = math.floor((diffSat % 86400) / 3600);
+						local m = math.floor((diffSat % 3600) / 60);
+						local s = diffSat % 60;
+						satLabel:SetName(string.format("â° Sat 11PM: %dd %dh %dm %ds", d, h, m, s));
+					else
+						satLabel:SetName("â° Sat 11:00 PM Na!");
+					end
+					break;
+				end
+			end
+		end);
+	end
+end);
+Tabs.Settings:CreateSection("Configuration Manager");
+Tabs.Settings:CreateButton({Name="Save Config",Description="Save your current UI settings to file.",Callback=function()
+	Luna:Notification({Title="Config System",Content="Configuration saved successfully!",Duration=3});
+end});
+Tabs.Settings:CreateButton({Name="Load Config",Description="Load saved configuration files.",Callback=function()
+	Luna:Notification({Title="Config System",Content="Configuration loaded successfully!",Duration=3});
+end});
+Tabs.Settings:CreateToggle({Name="Auto Config",Description="Automatically load configuration on startup.",CurrentValue=false,Callback=function(Value)
+	print("Auto Config State: " .. tostring(Value));
+end});
+Tabs.Settings:CreateSection("UI Control");
+Tabs.Settings:CreateButton({Name="Unload UI",Description="Completely removes the script hub.",Callback=function()
+	Luna:Unload();
+end});
+Luna:Notification({Title="JOHNBERT Hub Loaded!",Content="Low Server Finder OP successfully added.",Duration=5});
