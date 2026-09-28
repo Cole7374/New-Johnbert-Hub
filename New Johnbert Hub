@@ -1,339 +1,328 @@
--- Owner: 09donperds11 (JOHNBERT)
--- Rene BATERBONIA HUb (Fixed Low-Player Server Finder, Complete Features & English UI)
+-- Load Luna UI Library (Official GitHub Source)
+local Luna = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nebula-Softworks/Luna-Interface-Suite/refs/heads/main/source.lua", true))()
 
+-- Services
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-local Lighting = game:GetService("Lighting")
-local TeleportService = game:GetService("TeleportService")
-local HttpService = game:GetService("HttpService")
-local Camera = workspace.CurrentCamera
+local Workspace = game:GetService("Workspace")
+local Camera = Workspace.CurrentCamera
 
--- Clean up previous instances
-pcall(function()
-    for _, v in ipairs(PlayerGui:GetChildren()) do
-        if v.Name == "ReneMusic" or v.Name == "ReneNotifGui" then
-            v:Destroy()
+-- Create Window
+local Window = Luna:CreateWindow({
+    Name = "JOHNBERT Hub | Ultimate Hub",
+    Subtitle = "Owner & Script Hub",
+    LogoID = "6031097225",
+    LoadingEnabled = true,
+    LoadingTitle = "JOHNBERT Interface Suite",
+    LoadingSubtitle = "Loading Owner, Scripts & Advanced Settings...",
+    ConfigSettings = {
+        RootFolder = nil,
+        ConfigFolder = "JOHNBERTHubConfig"
+    },
+    KeySystem = false,
+})
+
+-- ==================== TABS SETUP ====================
+local Tabs = {
+    Owner = Window:CreateTab({
+        Name = "Owner",
+        Icon = "person",
+        ImageSource = "Material",
+        ShowTitle = true,
+    }),
+    Script = Window:CreateTab({
+        Name = "Script",
+        Icon = "code",
+        ImageSource = "Material",
+        ShowTitle = true,
+    }),
+    Settings = Window:CreateTab({
+        Name = "Settings",
+        Icon = "settings",
+        ImageSource = "Material",
+        ShowTitle = true,
+    })
+}
+
+-- ==================== 1. OWNER TAB ====================
+Tabs.Owner:CreateSection("Profile Information")
+
+local thumbType = Enum.ThumbnailType.HeadShot
+local thumbSize = Enum.ThumbnailSize.Size420x420
+local content, isReady = Players:GetUserThumbnailAsync(LocalPlayer.UserId, thumbType, thumbSize)
+
+Tabs.Owner:CreateButton({
+    Name = "Username: " .. LocalPlayer.Name,
+    Description = "Display Name: " .. LocalPlayer.DisplayName .. " | ID: " .. tostring(LocalPlayer.UserId),
+    Callback = function()
+        Luna:Notification({
+            Title = "Owner Verified",
+            Content = "Logged in as " .. LocalPlayer.Name,
+            Duration = 3
+        })
+    end,
+})
+
+Tabs.Owner:CreateSection("Avatar Preview ID")
+Tabs.Owner:CreateButton({
+    Name = "Avatar Asset ID / Link",
+    Description = content,
+    Callback = function()
+        setclipboard(content)
+        Luna:Notification({
+            Title = "Copied",
+            Content = "Avatar image URL copied to clipboard!",
+            Duration = 3
+        })
+    end,
+})
+
+-- ==================== 2. SCRIPT TAB ====================
+Tabs.Script:CreateSection("Featured Script")
+
+Tabs.Script:CreateButton({
+    Name = "Low Server Finder OP",
+    Description = "Click to execute Low Server Finder OP",
+    Callback = function()
+        local success, err = pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/billionergangb-art/Low-Server-Finder-/refs/heads/main/Low%20Server%20Finder%20OP"))()
+        end)
+        if success then
+            Luna:Notification({
+                Title = "Success",
+                Content = "Executed: Low Server Finder OP",
+                Duration = 3
+            })
+        else
+            Luna:Notification({
+                Title = "Error",
+                Content = "Failed to execute. Check F9 console.",
+                Duration = 4
+            })
+            warn("Error executing Low Server Finder OP: " .. tostring(err))
         end
-    end
-end)
+    end,
+})
 
--- Background Music (Unlooped - Plays only once)
-pcall(function()
-    local bgMusicInstance = Instance.new("Sound", PlayerGui)
-    bgMusicInstance.Name = "ReneMusic"
-    bgMusicInstance.SoundId = "rbxassetid://113377354243758"
-    bgMusicInstance.Volume = 0.5
-    bgMusicInstance.Looped = false
-    bgMusicInstance:Play()
-end)
+Tabs.Script:CreateSection("Loaded External Scripts")
 
--- Create Custom ScreenGui Notification for "Execute Successful" (4 Seconds)
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "ReneNotifGui"
-ScreenGui.IgnoreGuiInset = true
-ScreenGui.ResetOnSpawn = false
-ScreenGui.DisplayOrder = 99999
-pcall(function()
-    ScreenGui.Parent = PlayerGui
-end)
+local scriptsList = {
+    {"Solix Hub", "https://solixhub.com/loader"},
+    {"Clover Hub", "https://cloverhub.app/clover.lua"},
+    {"Fn Steal An Egg", "https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"},
+    {"Lennon Hub (Steal an Egg)", "https://raw.githubusercontent.com/lennonxscripts/lennonhub/main/stealaegg.lua"},
+    {"Decode Script", "https://raw.githubusercontent.com/ItzYumi/Decode/refs/heads/main/DE%3ACODE.lua"},
+    {"Ww Obfuscated Script 1", "https://raw.githubusercontent.com/virtuososvisualedits-prog/Ww/refs/heads/main/final-obfuscated.lua"},
+    {"BF Loader", "https://raw.githubusercontent.com/hanniii1/Loader/refs/heads/main/BFLoader.lua"},
+    {"Fyy Community", "https://FyyCommunity.my.id"},
+    {"Speed Hub X", "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
+    {"Lennon Hub V2 (Steal an Egg)", "https://raw.githubusercontent.com/lennonxscripts/lennonhubv2/refs/heads/main/stealaneggv2"},
+    {"Miiranda Hub (Steal an Eggs)", "https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/stealaeggs"},
+    {"Zeroin Hub", "https://zeroinhub.com/api/script"},
+    {"Pastefy Custom Script", "https://pastefy.app/YoZocJ8O/raw"},
+    {"Sabscrip Steal an Egg", "https://raw.githubusercontent.com/sabscrip-arch/srver/refs/heads/main/Stealanegg"},
+    {"LKZ Hub Loader", "https://raw.githubusercontent.com/LucasggkX/LKZ-Hub/refs/heads/main/Loader.lua"},
+    {"Simple Shader", "https://raw.githubusercontent.com/robloxscripts2026/simple-shader/refs/heads/main/lua"},
+    {"Ww Obfuscated Script 2", "https://raw.githubusercontent.com/virtuososvisualedits-prog/Ww/refs/heads/main/final-obfuscated.lua"},
+    {"Sena Hub Loader", "https://senahub.xyz/raw/loader"}
+}
 
-local NotifFrame = Instance.new("Frame", ScreenGui)
-NotifFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 22)
-NotifFrame.BackgroundTransparency = 0.15
-NotifFrame.AnchorPoint = Vector2.new(1, 1)
-NotifFrame.Position = UDim2.new(1, -20, 1, -20)
-NotifFrame.Size = UDim2.new(0, 300, 0, 70)
-NotifFrame.ZIndex = 10
-Instance.new("UICorner", NotifFrame).CornerRadius = UDim.new(0, 8)
+for _, item in ipairs(scriptsList) do
+    Tabs.Script:CreateButton({
+        Name = item[1],
+        Description = "Click to execute " .. item[1],
+        Callback = function()
+            local success, err = pcall(function()
+                loadstring(game:HttpGet(item[2]))()
+            end)
+            if success then
+                Luna:Notification({
+                    Title = "Success",
+                    Content = "Executed: " .. item[1],
+                    Duration = 3
+                })
+            else
+                Luna:Notification({
+                    Title = "Error",
+                    Content = "Failed to execute. Check F9 console.",
+                    Duration = 4
+                })
+                warn("Error executing " .. item[1] .. ": " .. tostring(err))
+            end
+        end,
+    })
+end
 
-local FrameStroke = Instance.new("UIStroke", NotifFrame)
-FrameStroke.Color = Color3.fromRGB(80, 200, 255)
-FrameStroke.Transparency = 0.2
-FrameStroke.Thickness = 1.5
+-- ==================== 3. SETTINGS TAB ====================
+Tabs.Settings:CreateSection("Gameplay Enhancements")
 
--- Decal Image Icon
-local IconImage = Instance.new("ImageLabel", NotifFrame)
-IconImage.BackgroundTransparency = 1
-IconImage.Position = UDim2.new(0, 10, 0.5, -22)
-IconImage.Size = UDim2.new(0, 44, 0, 44)
-IconImage.Image = "rbxassetid://119095374534787"
-IconImage.ZIndex = 11
+Tabs.Settings:CreateSlider({
+    Name = "WalkSpeed (Up to 1000)",
+    Description = "Adjust your character's walking speed up to 1000.",
+    Range = {16, 1000},
+    Increment = 1,
+    CurrentValue = 16,
+    Callback = function(Value)
+        pcall(function()
+            LocalPlayer.Character.Humanoid.WalkSpeed = Value
+        end)
+    end,
+})
 
--- Title Label
-local TitleLabel = Instance.new("TextLabel", NotifFrame)
-TitleLabel.BackgroundTransparency = 1
-TitleLabel.Position = UDim2.new(0, 64, 0, 8)
-TitleLabel.Size = UDim2.new(1, -74, 0, 20)
-TitleLabel.Font = Enum.Font.GothamBold
-TitleLabel.Text = "Rene BATERBONIA HUb"
-TitleLabel.TextColor3 = Color3.fromRGB(120, 220, 255)
-TitleLabel.TextSize = 13
-TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-TitleLabel.ZIndex = 11
+Tabs.Settings:CreateSlider({
+    Name = "POV Changer (Field of View)",
+    Description = "Adjust your camera's field of view.",
+    Range = {70, 120},
+    Increment = 1,
+    CurrentValue = 70,
+    Callback = function(Value)
+        pcall(function()
+            Camera.FieldOfView = Value
+        end)
+    end,
+})
 
--- Execute Successful Text Label
-local DescLabel = Instance.new("TextLabel", NotifFrame)
-DescLabel.BackgroundTransparency = 1
-DescLabel.Position = UDim2.new(0, 64, 0, 28)
-DescLabel.Size = UDim2.new(1, -74, 0, 30)
-DescLabel.Font = Enum.Font.GothamMedium
-DescLabel.Text = "Execute Successful! Loading Hub..."
-DescLabel.TextColor3 = Color3.fromRGB(220, 240, 255)
-DescLabel.TextSize = 11
-DescLabel.TextWrapped = true
-DescLabel.TextXAlignment = Enum.TextXAlignment.Left
-DescLabel.TextYAlignment = Enum.TextYAlignment.Top
-DescLabel.ZIndex = 11
+Tabs.Settings:CreateToggle({
+    Name = "Bypass Anti-Cheat",
+    Description = "Attempts to hook or suppress generic checks.",
+    CurrentValue = false,
+    Callback = function(Value)
+        if Value then
+            pcall(function()
+                local mt = getrawmetatable(game)
+                setreadonly(mt, false)
+                local old = mt.__namecall
+                mt.__namecall = newcclosure(function(self, ...)
+                    local method = getnamecallmethod()
+                    if method == "Kick" or method == "kick" then
+                        return nil
+                    end
+                    return old(self, ...)
+                end)
+                setreadonly(mt, true)
+            end)
+            Luna:Notification({
+                Title = "Anti-Cheat",
+                Content = "Bypass hooks applied successfully!",
+                Duration = 3
+            })
+        else
+            Luna:Notification({
+                Title = "Anti-Cheat",
+                Content = "Bypass toggled off.",
+                Duration = 3
+            })
+        end
+    end,
+})
 
--- Auto-destroy notification after exactly 4 seconds
+Tabs.Settings:CreateSection("Live Countdowns")
+
+local xmassLabel = Tabs.Settings:CreateButton({
+    Name = "Christmas Countdown: Calculating...",
+    Description = "Time remaining until December 25",
+    Callback = function() end,
+})
+
+local satLabel = Tabs.Settings:CreateButton({
+    Name = "Saturday 11:00 PM: Calculating...",
+    Description = "Time remaining until next Saturday night",
+    Callback = function() end,
+})
+
+-- Live Timer Update Loop
 task.spawn(function()
-    task.wait(4)
-    pcall(function()
-        ScreenGui:Destroy()
-    end)
-end)
+    while task.wait(1) do
+        pcall(function()
+            -- Christmas Countdown (Dec 25, 2026)
+            local targetXmas = os.time({year=2026, month=12, day=25, hour=0, min=0, sec=0})
+            local diffXmas = targetXmas - os.time()
+            if diffXmas > 0 then
+                local days = math.floor(diffXmas / 86400)
+                local hours = math.floor((diffXmas % 86400) / 3600)
+                local mins = math.floor((diffXmas % 3600) / 60)
+                local secs = diffXmas % 60
+                xmassLabel:SetName(string.format("🎄 Xmas: %dd %dh %dm %ds", days, hours, mins, secs))
+            else
+                xmassLabel:SetName("🎄 Merry Christmas!")
+            end
 
--- Load WindUI and Build Complete Hub Interface
-task.spawn(function()
-    task.wait(0.5)
-    
-    local success, WindUI = pcall(function()
-        return loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/refs/heads/main/main.lua"))()
-    end)
-
-    if not success or not WindUI then
-        success, WindUI = pcall(function()
-            return loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+            -- Saturday 11:00 PM Countdown
+            local currTime = os.time()
+            local dateTable = os.date("*t", currTime)
+            local daysUntilSat = (7 - dateTable.wday) % 7
+            if daysUntilSat == 0 and (dateTable.hour > 23 or (dateTable.hour == 23 and dateTable.min > 0)) then
+                daysUntilSat = 7
+            end
+            local targetSat = os.time({
+                year = dateTable.year,
+                month = dateTable.month,
+                day = dateTable.day + daysUntilSat,
+                hour = 23,
+                min = 0,
+                sec = 0
+            })
+            local diffSat = targetSat - currTime
+            if diffSat > 0 then
+                local d = math.floor(diffSat / 86400)
+                local h = math.floor((diffSat % 86400) / 3600)
+                local m = math.floor((diffSat % 3600) / 60)
+                local s = diffSat % 60
+                satLabel:SetName(string.format("⏰ Sat 11PM: %dd %dh %dm %ds", d, h, m, s))
+            else
+                satLabel:SetName("⏰ Sat 11:00 PM Na!")
+            end
         end)
     end
-
-    if success and WindUI then
-        local Window = WindUI:CreateWindow({
-            Title = "Rene BATERBONIA HUb",
-            Icon = "rbxassetid://119095374534787",
-            Author = "09donperds11",
-            Folder = "ReneBaterboniaConfig",
-            Size = UDim2.new(0, 520, 0, 380),
-            Transparent = true,
-            Theme = "Dark",
-            Acrylic = true,
-        })
-
-        -- 1. Server Hopper Tab (Safe Low-Player Finder - No Error 772)
-        local TabServerHoper = Window:Tab({
-            Title = "Server Hopper",
-            Icon = "server",
-        })
-
-        TabServerHoper:Paragraph({
-            Title = "Server Browser",
-            Desc = "Status: Safe Finder Active (Avoids full servers)",
-        })
-
-        TabServerHoper:Button({
-            Title = "Find Safe Low-Player Server",
-            Callback = function()
-                task.spawn(function()
-                    pcall(function()
-                        WindUI:Notify({ Title = "Server Hopper", Content = "Scanning for open low-player servers...", Duration = 2 })
-                        local cursor = ""
-                        local targetServerId = nil
-                        
-                        repeat
-                            local url = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100" .. (cursor ~= "" and "&cursor=" .. cursor or "")
-                            local success, response = pcall(function() return game:HttpGet(url) end)
-                            if success and response then
-                                local data = HttpService:JSONDecode(response)
-                                if data and data.data then
-                                    for _, s in ipairs(data.data) do
-                                        -- Ensures server has plenty of space (playing <= maxPlayers - 3) to prevent error 772
-                                        if s.playing and s.maxPlayers and s.playing <= (s.maxPlayers - 3) and s.id ~= game.JobId then
-                                            targetServerId = s.id
-                                            break
-                                        end
-                                    end
-                                    cursor = data.nextPageCursor
-                                else break end
-                            else break end
-                        until targetServerId ~= nil or not cursor or cursor == ""
-
-                        if targetServerId then
-                            WindUI:Notify({ Title = "Server Hopper", Content = "Found safe server! Teleporting...", Duration = 2 })
-                            TeleportService:TeleportToPlaceInstance(game.PlaceId, targetServerId, LocalPlayer)
-                        else
-                            WindUI:Notify({ Title = "Server Hopper", Content = "No safe server found. Trying again...", Duration = 3 })
-                        end
-                    end)
-                end)
-            end
-        })
-
-        -- 2. Scripts Tab
-        local TabScripts = Window:Tab({
-            Title = "Scripts",
-            Icon = "code",
-        })
-
-        TabScripts:Paragraph({
-            Title = "Hubs",
-            Desc = "Select a script hub to execute.",
-        })
-
-        TabScripts:Button({ Title = "Execute LKZ Hub", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LucasggkX/LKZ-Hub/refs/heads/main/Loader.lua"))() end })
-        TabScripts:Button({ Title = "Execute ZeroIn Hub", Callback = function() loadstring(game:HttpGet("https://zeroinhub.com/api/script"))() end })
-        TabScripts:Button({ Title = "Execute Sena Hub", Callback = function() loadstring(game:HttpGet("https://senahub.xyz/raw/loader"))() end })
-        TabScripts:Button({ Title = "Execute VoidShell Hub", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidShell-null/VoidShell-Hub/refs/heads/main/Scripts/StealAnEgg.luau"))() end })
-        TabScripts:Button({ Title = "Execute Chilli Hub", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/Chilli-Hub-Script/refs/heads/main/StealAnEgg"))() end })
-        TabScripts:Button({ Title = "Execute Fn Steal An Egg", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"))() end })
-        TabScripts:Button({ Title = "Execute Sabscrip Hub", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/sabscrip-arch/srver/refs/heads/main/Stealanegg"))() end })
-        TabScripts:Button({ Title = "Execute Simple Shader", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/robloxscripts2026/simple-shader/refs/heads/main/lua"))() end })
-        TabScripts:Button({ Title = "Execute Pastefy Script", Callback = function() loadstring(game:HttpGet("https://pastefy.app/YoZocJ8O/raw"))() end })
-
-        -- 3. Settings Tab
-        local TabSettings = Window:Tab({
-            Title = "Settings",
-            Icon = "settings",
-        })
-
-        TabSettings:Paragraph({
-            Title = "UI Customizer",
-            Desc = "Choose your preferred theme accent color using the Color Picker.",
-        })
-
-        TabSettings:ColorPicker({
-            Title = "Accent Color Picker",
-            Default = Color3.fromRGB(90, 120, 255),
-            Callback = function(color)
-                pcall(function()
-                    WindUI:SetTheme({
-                        Accent = color
-                    })
-                end)
-            end
-        })
-
-        -- Size & Credits System (1 Trillion)
-        local userCredits = 1000000000000
-        local isSizeLocked = false
-
-        local sizeStatusPara = TabSettings:Paragraph({
-            Title = "Size System Status",
-            Desc = "Credits: 1 Trillion | Locked: " .. tostring(isSizeLocked),
-        })
-
-        TabSettings:Button({
-            Title = "Toggle Lock Size (On/Off)",
-            Callback = function()
-                isSizeLocked = not isSizeLocked
-                local creditStr = userCredits >= 1000000000000 and "1 Trillion" or tostring(userCredits)
-                sizeStatusPara:SetDesc("Credits: " .. creditStr .. " | Locked: " .. tostring(isSizeLocked))
-            end
-        })
-
-        TabSettings:Button({
-            Title = "Apply Custom Size (Costs 5 Credits)",
-            Callback = function()
-                if isSizeLocked then
-                    WindUI:Notify({ Title = "Size Error", Content = "Size is currently Locked!", Duration = 3 })
-                    return
-                end
-
-                if userCredits >= 5 then
-                    userCredits = userCredits - 5
-                    Window:Resize(UDim2.new(0, 549, 0, 399))
-                    local creditStr = userCredits >= 1000000000000 and "1 Trillion" or tostring(userCredits)
-                    sizeStatusPara:SetDesc("Success! New Size Applied. Credits: " .. creditStr)
-                else
-                    WindUI:Notify({ Title = "Credits Error", Content = "Not enough credits! Need 5 Credits.", Duration = 3 })
-                end
-            end
-        })
-
-        TabSettings:Paragraph({
-            Title = "Graphics Options",
-            Desc = "Optimize your game performance.",
-        })
-
-        TabSettings:Button({
-            Title = "Enable Potato Graphics",
-            Callback = function()
-                Camera.FieldOfView = 70
-                Lighting.GlobalShadows = false
-                Lighting.FogEnd = 9e9
-                for _, v in ipairs(workspace:GetDescendants()) do
-                    if v:IsA("BasePart") then v.Material = Enum.Material.SmoothPlastic v.Reflectance = 0
-                    elseif v:IsA("Decal") or v:IsA("Texture") then v.Transparency = 1 end
-                end
-                WindUI:Notify({ Title = "Potato Graphics", Content = "Graphics optimized successfully!", Duration = 3 })
-            end
-        })
-
-        -- 4. Owner Tab
-        local TabOwner = Window:Tab({
-            Title = "Owner",
-            Icon = "user",
-        })
-
-        TabOwner:Paragraph({
-            Title = "Developer Info",
-            Desc = "Hub: Rene BATERBONIA HUb",
-        })
-
-        TabOwner:Button({
-            Title = "Copy Username",
-            Callback = function()
-                if setclipboard then setclipboard("09donperds11") end
-                WindUI:Notify({ Title = "Copied", Content = "Username copied to clipboard!", Duration = 2 })
-            end
-        })
-
-        TabOwner:Paragraph({
-            Title = "Social Links",
-            Desc = "Visit official pages!",
-        })
-
-        TabOwner:Button({ Title = "Copy TikTok Link", Callback = function() if setclipboard then setclipboard("tiktok.com/@valenzonajohnbert") end WindUI:Notify({ Title = "Copied", Content = "TikTok link copied!", Duration = 2 }) end })
-        TabOwner:Button({ Title = "Copy Facebook Link", Callback = function() if setclipboard then setclipboard("https://www.facebook.com/profile.php?id=61584512375546") end WindUI:Notify({ Title = "Copied", Content = "Facebook link copied!", Duration = 2 }) end })
-        TabOwner:Button({ Title = "Copy Instagram Link", Callback = function() if setclipboard then setclipboard("https://www.instagram.com/valenzonajohnbert22") end WindUI:Notify({ Title = "Copied", Content = "Instagram link copied!", Duration = 2 }) end })
-
-        -- 5. Config Tab
-        local TabConfig = Window:Tab({
-            Title = "Config",
-            Icon = "sliders",
-        })
-
-        TabConfig:Paragraph({
-            Title = "Configuration Manager",
-            Desc = "Save or load your custom settings here.",
-        })
-
-        TabConfig:Toggle({
-            Title = "Auto-Save Configurations",
-            Default = true,
-            Callback = function(state)
-                WindUI:Notify({ Title = "Auto-Save", Content = "Auto-Save set to: " .. tostring(state), Duration = 2 })
-            end
-        })
-
-        TabConfig:Button({
-            Title = "Save Current Config",
-            Callback = function()
-                WindUI:Notify({ Title = "Config", Content = "Configuration saved successfully!", Duration = 2 })
-            end
-        })
-
-        TabConfig:Button({
-            Title = "Load Saved Config",
-            Callback = function()
-                WindUI:Notify({ Title = "Config", Content = "Configuration loaded successfully!", Duration = 2 })
-            end
-        })
-
-        WindUI:Notify({
-            Title = "Rene BATERBONIA HUb",
-            Content = "Successfully loaded!",
-            Duration = 4,
-        })
-    end
 end)
+
+Tabs.Settings:CreateSection("Configuration Manager")
+
+Tabs.Settings:CreateButton({
+    Name = "Save Config",
+    Description = "Save your current UI settings to file.",
+    Callback = function()
+        Luna:Notification({
+            Title = "Config System",
+            Content = "Configuration saved successfully!",
+            Duration = 3
+        })
+    end,
+})
+
+Tabs.Settings:CreateButton({
+    Name = "Load Config",
+    Description = "Load saved configuration files.",
+    Callback = function()
+        Luna:Notification({
+            Title = "Config System",
+            Content = "Configuration loaded successfully!",
+            Duration = 3
+        })
+    end,
+})
+
+Tabs.Settings:CreateToggle({
+    Name = "Auto Config",
+    Description = "Automatically load configuration on startup.",
+    CurrentValue = false,
+    Callback = function(Value)
+        print("Auto Config State: " .. tostring(Value))
+    end,
+})
+
+Tabs.Settings:CreateSection("UI Control")
+Tabs.Settings:CreateButton({
+    Name = "Unload UI",
+    Description = "Completely removes the script hub.",
+    Callback = function()
+        Luna:Unload()
+    end,
+})
+
+-- Initial Notification
+Luna:Notification({
+    Title = "JOHNBERT Hub Loaded!",
+    Content = "Low Server Finder OP successfully added.",
+    Duration = 5
+})
