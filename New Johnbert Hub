@@ -1,5 +1,5 @@
 -- Owner: 09donperds11 (JOHNBERT)
--- Hub: RENE BATERBONIA HUB - Steal An Egg (Optimized)
+-- Hub: RENE BATERBONIA HUB - Steal An Egg (No Animations, No Config System)
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -8,7 +8,7 @@ local UserInputService = game:GetService("UserInputService")
 local Lighting = game:GetService("Lighting")
 local TeleportService = game:GetService("TeleportService")
 local HttpService = game:GetService("HttpService")
-local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
 
 pcall(function()
@@ -19,39 +19,47 @@ pcall(function()
     end
 end)
 
+-- Custom Button Sound Effect Helper
+local function PlayClickSound()
+    pcall(function()
+        local ClickSound = Instance.new("Sound", PlayerGui)
+        ClickSound.SoundId = "rbxassetid://102702078778790"
+        ClickSound.Volume = 1
+        ClickSound.PlayOnRemove = true
+        ClickSound:Destroy()
+    end)
+end
+
 pcall(function()
     local BgMusic = Instance.new("Sound", PlayerGui)
     BgMusic.Name = "ReneMusic"
     BgMusic.SoundId = "rbxassetid://113377354243758"
     BgMusic.Volume = 0.5
+    BgMusic.Looped = false
     BgMusic:Play()
 end)
 
-local function PlayClickSound()
-    pcall(function()
-        local ClickSound = Instance.new("Sound", PlayerGui)
-        ClickSound.SoundId = "rbxassetid://102702078778790"
-        ClickSound.Volume = 1.0
-        ClickSound:Play()
-        game:GetService("Debris"):AddItem(ClickSound, 2)
-    end)
-end
-
-local ScreenGui = Instance.new("ScreenGui", PlayerGui)
+local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "ReneBaterboniaMain"
 ScreenGui.IgnoreGuiInset = true
 ScreenGui.ResetOnSpawn = false
-ScreenGui.DisplayOrder = 100
+ScreenGui.DisplayOrder = 99999
+pcall(function()
+    ScreenGui.Parent = PlayerGui
+end)
 
-local ToggleGui = Instance.new("ScreenGui", PlayerGui)
+local ToggleGui = Instance.new("ScreenGui")
 ToggleGui.Name = "ReneBaterboniaToggle"
 ToggleGui.IgnoreGuiInset = true
 ToggleGui.ResetOnSpawn = false
-ToggleGui.DisplayOrder = 101
+ToggleGui.DisplayOrder = 99999
+pcall(function()
+    ToggleGui.Parent = PlayerGui
+end)
 
 local MainFrame = Instance.new("Frame", ScreenGui)
-MainFrame.BackgroundColor3 = Color3.fromRGB(20, 30, 50)
-MainFrame.BackgroundTransparency = 0.55 -- Gi-dugangan og +30 transparency (0.25 + 0.30)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 35, 45)
+MainFrame.BackgroundTransparency = 0.4
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 MainFrame.Size = UDim2.new(0, 440, 0, 260)
@@ -59,8 +67,8 @@ MainFrame.Visible = false
 MainFrame.ZIndex = 10
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
 local MainStroke = Instance.new("UIStroke", MainFrame)
-MainStroke.Color = Color3.fromRGB(70, 130, 220)
-MainStroke.Transparency = 0.55
+MainStroke.Color = Color3.fromRGB(70, 180, 220)
+MainStroke.Transparency = 0.4
 MainStroke.Thickness = 2
 
 local draggingMain, dragStartMain, startPosMain
@@ -83,20 +91,21 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
+-- Toggle Icon (Solid / Dili transparent)
 local ToggleButton = Instance.new("ImageButton", ToggleGui)
-ToggleButton.BackgroundColor3 = Color3.fromRGB(20, 30, 50)
-ToggleButton.BackgroundTransparency = 0.55
+ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 35, 45)
+ToggleButton.BackgroundTransparency = 0
 ToggleButton.AnchorPoint = Vector2.new(0, 0.5)
 ToggleButton.Position = UDim2.new(0, 10, 0.5, 0)
 ToggleButton.Size = UDim2.new(0, 42, 0, 42)
 ToggleButton.Image = "rbxassetid://119095374534787"
-ToggleButton.ImageTransparency = 1
+ToggleButton.ImageTransparency = 0
 ToggleButton.Visible = false
 ToggleButton.ZIndex = 20
 Instance.new("UICorner", ToggleButton).CornerRadius = UDim.new(0, 8)
 local ToggleStroke = Instance.new("UIStroke", ToggleButton)
-ToggleStroke.Color = Color3.fromRGB(70, 130, 220)
-ToggleStroke.Transparency = 0.55
+ToggleStroke.Color = Color3.fromRGB(70, 180, 220)
+ToggleStroke.Transparency = 0
 ToggleStroke.Thickness = 2
 
 local draggingToggle, dragStartToggle, startPosToggle
@@ -119,29 +128,9 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-local function FadeInMain()
-    MainFrame.Visible = true
-    MainFrame.BackgroundTransparency = 1
-    MainStroke.Transparency = 1
-    local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-    TweenService:Create(MainFrame, tweenInfo, {BackgroundTransparency = 0.55}):Play()
-    TweenService:Create(MainStroke, tweenInfo, {Transparency = 0.55}):Play()
-end
-
-local function FadeInToggle()
-    ToggleButton.Visible = true
-    local tweenInfo = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-    TweenService:Create(ToggleButton, tweenInfo, {BackgroundTransparency = 0.55, ImageTransparency = 0}):Play()
-    TweenService:Create(ToggleStroke, tweenInfo, {Transparency = 0.55}):Play()
-end
-
 ToggleButton.MouseButton1Click:Connect(function()
     PlayClickSound()
-    FadeInMain()
-    local hideTween = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-    TweenService:Create(ToggleButton, hideTween, {BackgroundTransparency = 1, ImageTransparency = 1}):Play()
-    TweenService:Create(ToggleStroke, hideTween, {Transparency = 1}):Play()
-    task.wait(0.3)
+    MainFrame.Visible = true
     ToggleButton.Visible = false
 end)
 
@@ -162,8 +151,8 @@ TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 TitleLabel.ZIndex = 11
 
 local CloseButton = Instance.new("TextButton", TopBar)
-CloseButton.BackgroundColor3 = Color3.fromRGB(50, 100, 180)
-CloseButton.BackgroundTransparency = 0.55
+CloseButton.BackgroundColor3 = Color3.fromRGB(30, 120, 160)
+CloseButton.BackgroundTransparency = 0.4
 CloseButton.Position = UDim2.new(1, -26, 0.5, -8)
 CloseButton.Size = UDim2.new(0, 16, 0, 16)
 CloseButton.Font = Enum.Font.GothamBold
@@ -175,17 +164,13 @@ Instance.new("UICorner", CloseButton).CornerRadius = UDim.new(0, 4)
 
 CloseButton.MouseButton1Click:Connect(function()
     PlayClickSound()
-    local hideTween = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-    TweenService:Create(MainFrame, hideTween, {BackgroundTransparency = 1}):Play()
-    TweenService:Create(MainStroke, hideTween, {Transparency = 1}):Play()
-    task.wait(0.3)
     MainFrame.Visible = false
-    FadeInToggle()
+    ToggleButton.Visible = true
 end)
 
 local SearchBox = Instance.new("TextBox", MainFrame)
-SearchBox.BackgroundColor3 = Color3.fromRGB(15, 22, 38)
-SearchBox.BackgroundTransparency = 0.65
+SearchBox.BackgroundColor3 = Color3.fromRGB(15, 35, 45)
+SearchBox.BackgroundTransparency = 0.5
 SearchBox.Position = UDim2.new(0, 124, 0, 32)
 SearchBox.Size = UDim2.new(0, 308, 0, 22)
 SearchBox.Font = Enum.Font.GothamBold
@@ -197,13 +182,13 @@ SearchBox.TextSize = 9
 SearchBox.ZIndex = 11
 Instance.new("UICorner", SearchBox).CornerRadius = UDim.new(0, 4)
 local SearchStroke = Instance.new("UIStroke", SearchBox)
-SearchStroke.Color = Color3.fromRGB(50, 90, 150)
-SearchStroke.Transparency = 0.55
+SearchStroke.Color = Color3.fromRGB(70, 180, 220)
+SearchStroke.Transparency = 0.5
 SearchStroke.Thickness = 1
 
 local Sidebar = Instance.new("ScrollingFrame", MainFrame)
-Sidebar.BackgroundColor3 = Color3.fromRGB(15, 22, 38)
-Sidebar.BackgroundTransparency = 0.65
+Sidebar.BackgroundColor3 = Color3.fromRGB(15, 35, 45)
+Sidebar.BackgroundTransparency = 0.5
 Sidebar.Position = UDim2.new(0, 8, 0, 58)
 Sidebar.Size = UDim2.new(0, 110, 0, 192)
 Sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
@@ -219,16 +204,6 @@ SidebarLayout.SortOrder = Enum.SortOrder.LayoutOrder
 SidebarLayout.FillDirection = Enum.FillDirection.Vertical
 SidebarLayout.Padding = UDim.new(0, 4)
 
--- Steady Sidebar Avatar
-local SidebarAvatar = Instance.new("ImageLabel", Sidebar)
-SidebarAvatar.BackgroundColor3 = Color3.fromRGB(30, 45, 70)
-SidebarAvatar.BackgroundTransparency = 0.65
-SidebarAvatar.Size = UDim2.new(1, 0, 0, 50)
-SidebarAvatar.Image = "rbxthumb://type=AvatarHeadShot&id=8064284458&w=420&h=420"
-SidebarAvatar.ScaleType = Enum.ScaleType.Fit
-SidebarAvatar.ZIndex = 12
-Instance.new("UICorner", SidebarAvatar).CornerRadius = UDim.new(0, 5)
-
 local ContentContainer = Instance.new("Frame", MainFrame)
 ContentContainer.BackgroundTransparency = 1
 ContentContainer.Position = UDim2.new(0, 124, 0, 58)
@@ -238,11 +213,44 @@ ContentContainer.ZIndex = 11
 local pages = {}
 local activePage = nil
 local allElements = {}
+local themeObjects = { Frames = {}, Buttons = {}, Strokes = {} }
+
+local function RegisterThemeElement(obj, typeName)
+    if typeName == "Frame" then table.insert(themeObjects.Frames, obj)
+    elseif typeName == "Button" then table.insert(themeObjects.Buttons, obj)
+    elseif typeName == "Stroke" then table.insert(themeObjects.Strokes, obj) end
+end
+
+local function ApplyThemeColors(bgCol, btnCol, strokeCol)
+    for _, f in ipairs(themeObjects.Frames) do if f and f.Parent then f.BackgroundColor3 = bgCol end end
+    for _, b in ipairs(themeObjects.Buttons) do if b and b.Parent then b.BackgroundColor3 = btnCol end end
+    for _, s in ipairs(themeObjects.Strokes) do if s and s.Parent then s.Color = strokeCol end end
+    if MainFrame and MainFrame.Parent then MainFrame.BackgroundColor3 = bgCol end
+    if SearchBox and SearchBox.Parent then SearchBox.BackgroundColor3 = bgCol end
+    if Sidebar and Sidebar.Parent then Sidebar.BackgroundColor3 = bgCol end
+    if MainStroke and MainStroke.Parent then MainStroke.Color = strokeCol end
+    if SearchStroke and SearchStroke.Parent then SearchStroke.Color = strokeCol end
+end
+
+local rainbowConnection = nil
+local function SetTheme(themeName)
+    if rainbowConnection then rainbowConnection:Disconnect() rainbowConnection = nil end
+    if themeName == "Rainbow" then
+        rainbowConnection = RunService.RenderStepped:Connect(function()
+            local hue = (tick() % 5) / 5
+            ApplyThemeColors(Color3.fromRGB(20, 20, 25), Color3.fromHSV(hue, 0.8, 1), Color3.fromHSV(hue, 0.7, 0.9))
+        end)
+    elseif themeName == "White" then ApplyThemeColors(Color3.fromRGB(240, 240, 245), Color3.fromRGB(210, 210, 220), Color3.fromRGB(150, 150, 160))
+    elseif themeName == "Dark" then ApplyThemeColors(Color3.fromRGB(15, 15, 20), Color3.fromRGB(30, 30, 40), Color3.fromRGB(70, 70, 90))
+    elseif themeName == "Cherry" then ApplyThemeColors(Color3.fromRGB(40, 15, 25), Color3.fromRGB(140, 40, 75), Color3.fromRGB(220, 80, 120))
+    elseif themeName == "Cyan" then ApplyThemeColors(Color3.fromRGB(15, 35, 45), Color3.fromRGB(30, 120, 160), Color3.fromRGB(70, 180, 220))
+    elseif themeName == "Emerald" then ApplyThemeColors(Color3.fromRGB(15, 40, 30), Color3.fromRGB(30, 140, 90), Color3.fromRGB(70, 220, 140)) end
+end
 
 local function CreateTab(name)
     local TabBtn = Instance.new("TextButton", Sidebar)
-    TabBtn.BackgroundColor3 = Color3.fromRGB(35, 55, 90)
-    TabBtn.BackgroundTransparency = 0.65
+    TabBtn.BackgroundColor3 = Color3.fromRGB(30, 120, 160)
+    TabBtn.BackgroundTransparency = 0.5
     TabBtn.Size = UDim2.new(1, 0, 0, 26)
     TabBtn.Font = Enum.Font.GothamBold
     TabBtn.Text = name
@@ -250,6 +258,7 @@ local function CreateTab(name)
     TabBtn.TextSize = 9
     TabBtn.ZIndex = 12
     Instance.new("UICorner", TabBtn).CornerRadius = UDim.new(0, 4)
+    RegisterThemeElement(TabBtn, "Button")
 
     local Page = Instance.new("ScrollingFrame", ContentContainer)
     Page.BackgroundTransparency = 1
@@ -285,11 +294,12 @@ end
 
 local function AddParagraph(tab, title, desc)
     local f = Instance.new("Frame", tab)
-    f.BackgroundColor3 = Color3.fromRGB(30, 45, 70)
-    f.BackgroundTransparency = 0.65
+    f.BackgroundColor3 = Color3.fromRGB(20, 50, 70)
+    f.BackgroundTransparency = 0.5
     f.Size = UDim2.new(1, 0, 0, 36)
     f.ZIndex = 13
     Instance.new("UICorner", f).CornerRadius = UDim.new(0, 5)
+    RegisterThemeElement(f, "Frame")
     
     local t = Instance.new("TextLabel", f)
     t.BackgroundTransparency = 1
@@ -319,8 +329,8 @@ end
 
 local function AddButton(tab, name, callback)
     local btn = Instance.new("TextButton", tab)
-    btn.BackgroundColor3 = Color3.fromRGB(45, 90, 160)
-    btn.BackgroundTransparency = 0.55
+    btn.BackgroundColor3 = Color3.fromRGB(30, 120, 160)
+    btn.BackgroundTransparency = 0.4
     btn.Size = UDim2.new(1, 0, 0, 24)
     btn.Font = Enum.Font.GothamBold
     btn.Text = name
@@ -328,6 +338,7 @@ local function AddButton(tab, name, callback)
     btn.TextSize = 9
     btn.ZIndex = 13
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 5)
+    RegisterThemeElement(btn, "Button")
 
     btn.MouseButton1Click:Connect(function()
         PlayClickSound()
@@ -335,6 +346,7 @@ local function AddButton(tab, name, callback)
     end)
 
     table.insert(allElements, {Object = btn, Text = string.lower(name)})
+    return btn
 end
 
 SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
@@ -347,13 +359,14 @@ end)
 -- Creator Tab
 local TabCreator = CreateTab("Creator")
 local CreatorAvatar = Instance.new("ImageLabel", TabCreator)
-CreatorAvatar.BackgroundColor3 = Color3.fromRGB(30, 45, 70)
-CreatorAvatar.BackgroundTransparency = 0.65
+CreatorAvatar.BackgroundColor3 = Color3.fromRGB(20, 50, 70)
+CreatorAvatar.BackgroundTransparency = 0.5
 CreatorAvatar.Size = UDim2.new(1, 0, 0, 80)
 CreatorAvatar.Image = "rbxthumb://type=AvatarHeadShot&id=8064284458&w=420&h=420"
 CreatorAvatar.ScaleType = Enum.ScaleType.Fit
 CreatorAvatar.ZIndex = 13
 Instance.new("UICorner", CreatorAvatar).CornerRadius = UDim.new(0, 5)
+RegisterThemeElement(CreatorAvatar, "Frame")
 
 AddParagraph(TabCreator, "Developer Info", "Owner: 09donperds11 (JOHNBERT)")
 AddButton(TabCreator, "Copy Username", function()
@@ -403,6 +416,15 @@ end)
 
 -- Settings Tab
 local TabSettings = CreateTab("Settings")
+
+AddParagraph(TabSettings, "Theme Customizer", "Pilia ang imong paborito nga UI theme.")
+AddButton(TabSettings, "Theme: Cyan (Default)", function() SetTheme("Cyan") end)
+AddButton(TabSettings, "Theme: Rainbow", function() SetTheme("Rainbow") end)
+AddButton(TabSettings, "Theme: Dark", function() SetTheme("Dark") end)
+AddButton(TabSettings, "Theme: White", function() SetTheme("White") end)
+AddButton(TabSettings, "Theme: Cherry", function() SetTheme("Cherry") end)
+AddButton(TabSettings, "Theme: Emerald", function() SetTheme("Emerald") end)
+
 AddParagraph(TabSettings, "Graphics Options", "I-optimize ang performance.")
 AddButton(TabSettings, "Enable Potato Graphics", function()
     Camera.FieldOfView = 70
@@ -427,7 +449,4 @@ AddButton(TabStealEgg, "Execute Sabscrip Hub", function() loadstring(game:HttpGe
 AddButton(TabStealEgg, "Execute Simple Shader", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/robloxscripts2026/simple-shader/refs/heads/main/lua"))() end)
 AddButton(TabStealEgg, "Execute Pastefy Script", function() loadstring(game:HttpGet("https://pastefy.app/YoZocJ8O/raw"))() end)
 
-task.spawn(function()
-    task.wait(3)
-    FadeInMain()
-end)
+MainFrame.Visible = true
